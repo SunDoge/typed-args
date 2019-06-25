@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     sys.argv.extend(argv)
 
-    args = Args(parser)
+    args = Args(parser.parse_args())
 
     assert args.arch == arch
     assert args.data == data
