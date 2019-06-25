@@ -1,5 +1,7 @@
 # TypeArgs
 
+Strong type args.
+
 ## Install
 
 ```bash
