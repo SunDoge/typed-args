@@ -7,7 +7,7 @@ __version__ = '0.1.0'
 @dataclass
 class TypeArgs:
     parser: argparse.ArgumentParser
-    parse_known_args: bool = True
+    parse_known_args: bool = False
 
     def __post_init__(self):
 
