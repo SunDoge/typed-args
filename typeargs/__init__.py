@@ -1,14 +1,21 @@
 import argparse
-from dataclasses import dataclass
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 
-@dataclass
 class TypeArgs:
+    parser: argparse.ArgumentParser
     _args: argparse.Namespace
 
-    def __post_init__(self):
+    def parse_args(self):
+        self._args = self.parser.parse_args()
+        self._assign_args()
+
+    def parse_known_args(self):
+        self._args, _ = self.parser.parse_known_args()
+        self._assign_args()
+
+    def _assign_args(self):
 
         for key, value in self.__dict__.items():
             if isinstance(value, argparse.Action):

@@ -1,8 +1,8 @@
 import io
-import re
 import os
+import re
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def read(*names, **kwargs):
@@ -26,7 +26,7 @@ def find_version(*file_paths):
 VERSION = find_version('flame', '__init__.py')
 
 requirements = [
-    'dataclasses'
+
 ]
 
 setup(
