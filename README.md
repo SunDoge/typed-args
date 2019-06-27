@@ -11,25 +11,28 @@ pip install git+https://github.com/SunDoge/typeargs.git
 ## Usage
 
 ```python
-from typeargs import TypeArgs
-from dataclasses import dataclass
 import argparse
 import sys
 
+from typeargs import TypeArgs
 
-parser = argparse.ArgumentParser()
-@dataclass
+
 class Args(TypeArgs):
-    data: str = parser.add_argument('data', metavar='DIR',
-                                    help='path to dataset')
-    arch: str = parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
-                                    help='model architecture: ' +
-                                    ' (default: resnet18)')
-    num_workers: int = parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
-                                           help='number of data loading workers (default: 4)')
+
+    def __init__(self):
+        self.parser = argparse.ArgumentParser()
+        self.data: str = self.parser.add_argument('data', metavar='DIR',
+                                                  help='path to dataset')
+        self.arch: str = self.parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
+                                                  help='model architecture: ' +
+                                                  ' (default: resnet18)')
+        self.num_workers: int = self.parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+                                                         help='number of data loading workers (default: 4)')
+
+        self.parse_args()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     data = '/path/to/dataset'
     arch = 'resnet50'
     num_workers = 8
@@ -38,7 +41,7 @@ if __name__ == "__main__":
 
     sys.argv.extend(argv)
 
-    args = Args(parser.parse_args())
+    args = Args()
 
     assert args.arch == arch
     assert args.data == data
