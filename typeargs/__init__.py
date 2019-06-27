@@ -1,6 +1,6 @@
 import argparse
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 class TypeArgs:
@@ -21,3 +21,9 @@ class TypeArgs:
             if isinstance(value, argparse.Action):
                 dest = value.dest
                 self.__dict__[key] = self._args.__dict__[dest]
+
+    def __contains__(self, key):
+        '''
+        Copy from argparse.Namespace
+        '''
+        return key in self.__dict__
