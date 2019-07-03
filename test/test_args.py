@@ -1,22 +1,23 @@
 import argparse
 import sys
 
-from typeargs import TypeArgs
+from typedargs import TypedArgs
 
 
-class Args(TypeArgs):
+class Args(TypedArgs):
 
     def __init__(self):
-        self.parser = argparse.ArgumentParser()
-        self.data: str = self.parser.add_argument('data', metavar='DIR',
-                                                  help='path to dataset')
-        self.arch: str = self.parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
-                                                  help='model architecture: ' +
-                                                  ' (default: resnet18)')
-        self.num_workers: int = self.parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
-                                                         help='number of data loading workers (default: 4)')
+        parser = argparse.ArgumentParser()
 
-        self.parse_args()
+        self.data: str = parser.add_argument('data', metavar='DIR',
+                                             help='path to dataset')
+        self.arch: str = parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
+                                             help='model architecture: ' +
+                                             ' (default: resnet18)')
+        self.num_workers: int = parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+                                                    help='number of data loading workers (default: 4)')
+
+        self.parse_args(parser)
 
 
 def test_args():

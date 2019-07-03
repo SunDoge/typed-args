@@ -30,7 +30,7 @@ requirements = [
 ]
 
 setup(
-    name='typeargs',
+    name='typedargs',
     version=VERSION,
     author='SunDoge',
     packages=find_packages(exclude=['test']),

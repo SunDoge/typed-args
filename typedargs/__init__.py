@@ -1,18 +1,20 @@
 import argparse
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 
-class TypeArgs:
-    parser: argparse.ArgumentParser
+class TypedArgs:
+    _parser: argparse.ArgumentParser
     _args: argparse.Namespace
 
-    def parse_args(self):
-        self._args = self.parser.parse_args()
+    def parse_args(self, parser: argparse.ArgumentParser):
+        self._parser = parser
+        self._args = self._parser.parse_args()
         self._assign_args()
 
-    def parse_known_args(self):
-        self._args, _ = self.parser.parse_known_args()
+    def parse_known_args(self, parser: argparse.ArgumentParser):
+        self._parser = parser
+        self._args, _ = self._parser.parse_known_args()
         self._assign_args()
 
     def _assign_args(self):
