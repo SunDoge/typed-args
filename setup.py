@@ -23,7 +23,14 @@ def find_version(*file_paths):
         raise RuntimeError("Unable to find version string.")
 
 
-VERSION = find_version('typeargs', '__init__.py')
+def read_long_description():
+    with open('README.md', 'r') as f:
+        long_description = f.read()
+
+    return long_description
+
+
+VERSION = find_version('typedargs', '__init__.py')
 
 requirements = [
 
@@ -33,6 +40,10 @@ setup(
     name='typedargs',
     version=VERSION,
     author='SunDoge',
+    author_email='384813529@qq.com',
+    long_description=read_long_description(),
+    long_description_content_type='text/markdown',
+    url='https://github.com/SunDoge/typedargs',
     packages=find_packages(exclude=['test']),
     install_requires=requirements,
 )
