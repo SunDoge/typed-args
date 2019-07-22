@@ -17,7 +17,7 @@ class Args(TypedArgs):
         self.num_workers: int = parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                                                     help='number of data loading workers (default: 4)')
 
-        self.parse_args(parser)
+        self.parse_args_from(parser)
 
 
 def test_args():
@@ -34,3 +34,7 @@ def test_args():
     assert args.arch == arch
     assert args.data == data
     assert args.num_workers == num_workers
+
+
+if __name__ == "__main__":
+    test_args()
