@@ -6,8 +6,15 @@ Strong type args.
 
 ## Install
 
+From pypi
+
 ```bash
-pip install git+https://github.com/SunDoge/typeargs.git
+pip install typed-args
+```
+
+From github
+```bash
+pip install git+https://github.com/SunDoge/typed-args.git
 ```
 
 ## Usage
