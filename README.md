@@ -1,4 +1,4 @@
-# TypeArgs
+# TypedArgs
 
 [![Build Status](https://travis-ci.org/SunDoge/typeargs.svg?branch=master)](https://travis-ci.org/SunDoge/typeargs)
 
