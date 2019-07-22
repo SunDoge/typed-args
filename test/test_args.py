@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from typedargs import TypedArgs
+from typed_args import TypedArgs
 
 
 class Args(TypedArgs):

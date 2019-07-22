@@ -30,14 +30,14 @@ def read_long_description():
     return long_description
 
 
-VERSION = find_version('typedargs', '__init__.py')
+VERSION = find_version('typed_args', '__init__.py')
 
 requirements = [
 
 ]
 
 setup(
-    name='typedargs',
+    name='typed-args',
     version=VERSION,
     author='SunDoge',
     author_email='384813529@qq.com',
