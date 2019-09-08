@@ -1,5 +1,5 @@
-from argparse import ArgumentParser, Action, Namespace
-from typing import Union, TypeVar
+from argparse import Action, ArgumentParser, Namespace
+from typing import TypeVar, Union
 
 __version__ = '0.2.0'
 
