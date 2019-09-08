@@ -1,6 +1,7 @@
 import argparse
+from typing import Union, TypeVar
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 
 class TypedArgs:
@@ -21,11 +22,19 @@ class TypedArgs:
 
         for key, value in self.__dict__.items():
             if isinstance(value, argparse.Action):
+                # Get arg name from Action
                 dest = value.dest
                 self.__dict__[key] = self._args.__dict__[dest]
 
     def __contains__(self, key):
-        '''
+        """
         Copy from argparse.Namespace
-        '''
+        """
         return key in self.__dict__
+
+
+"""
+This type alias is added to fool PyCharm.
+"""
+T = TypeVar('T')
+ArgType = Union[argparse.Action, T]
