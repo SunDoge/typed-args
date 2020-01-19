@@ -1,7 +1,7 @@
 from argparse import Action, ArgumentParser, Namespace
 from typing import TypeVar, Union
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
 class TypedArgs:
@@ -31,6 +31,9 @@ class TypedArgs:
         Copy from Namespace
         """
         return key in self.__dict__
+
+    def __repr__(self):
+        return str(self._args)
 
 
 """
