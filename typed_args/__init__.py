@@ -3,7 +3,7 @@ from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass, field
 from typing import Union, Optional, Any, Iterable, List, Tuple
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 LOGGER = logging.getLogger(__name__)
 
