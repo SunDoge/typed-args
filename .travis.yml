@@ -4,8 +4,11 @@ language: python
 python:
   - "3.6"
   - "3.7"
+install:
+  - pip install dataclasses
 script:
   - pytest
 # Don't notify me on success.
 notifications:
-  on_success: never
+  email:
+    on_success: never
