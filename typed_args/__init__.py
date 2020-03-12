@@ -3,48 +3,9 @@ from typing import TypeVar, Union, Optional, Any, Iterable, List, Tuple
 from dataclasses import dataclass
 import logging
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 LOGGER = logging.getLogger(__name__)
-
-
-class TypedArgsOld:
-    _parser: ArgumentParser
-    _args: Namespace
-
-    def parse_args_from(self, parser: ArgumentParser):
-        self._parser = parser
-        self._args = self._parser.parse_args()
-        self._assign_args()
-
-    def parse_known_args_from(self, parser: ArgumentParser):
-        self._parser = parser
-        self._args, _ = self._parser.parse_known_args()
-        self._assign_args()
-
-    def _assign_args(self):
-
-        for key, value in self.__dict__.items():
-            if isinstance(value, Action):
-                # Get arg name from Action
-                dest = value.dest
-                self.__dict__[key] = self._args.__dict__[dest]
-
-    def __contains__(self, key):
-        """
-        Copy from Namespace
-        """
-        return key in self.__dict__
-
-    def __repr__(self):
-        return str(self._args)
-
-
-"""
-This type alias is added to fool PyCharm.
-"""
-T = TypeVar('T')
-ArgType = Union[Action, T]
 
 
 @dataclass
@@ -72,7 +33,7 @@ class TypedArgs:
     def add_argument(self, name: str, annotation: Any):
         phantom_action: PhantomAction = getattr(self, name)
 
-        print('phantom action:', phantom_action)
+        LOGGER.debug('phantom action = %s', phantom_action)
         if phantom_action.option_strings[0].startswith('-'):  # optional
             self.parser.add_argument(
                 *phantom_action.option_strings,
@@ -140,7 +101,5 @@ def add_argument(
         help: Optional[str] = None,
         metavar: Optional[str] = None,
 ):
-    # if type(option_strings) == str:
-    #     option_strings = [option_strings]
-    print('locals:', locals())
+    LOGGER.debug('locals = %s', locals())
     return PhantomAction(**locals())

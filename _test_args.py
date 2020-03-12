@@ -3,6 +3,9 @@ import sys
 from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 # class Args(TypedArgs):
