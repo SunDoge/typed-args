@@ -1,7 +1,7 @@
-from argparse import Action, ArgumentParser, Namespace
-from typing import TypeVar, Union, Optional, Any, Iterable, List, Tuple
-from dataclasses import dataclass
 import logging
+from argparse import ArgumentParser, Namespace
+from dataclasses import dataclass, field
+from typing import Union, Optional, Any, Iterable, List, Tuple
 
 __version__ = '0.3.0'
 
@@ -10,7 +10,7 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class TypedArgs:
-    parser: ArgumentParser = ArgumentParser()
+    parser: ArgumentParser = field(default_factory=ArgumentParser)
 
     @classmethod
     def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
@@ -49,7 +49,8 @@ class TypedArgs:
                 dest=name,  # use attribute name
             )
         else:
-            # No dset
+            # No dest
+            # for positional argument actions, dest is normally supplied as the first argument to add_argument()
             # No required
             self.parser.add_argument(
                 phantom_action.option_strings[0],  # positional arg has only one str input

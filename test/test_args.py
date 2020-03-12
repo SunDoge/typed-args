@@ -36,9 +36,25 @@ def test_args():
 
     argv = f'{data} -a {arch} --workers {num_workers}'.split()
 
-    sys.argv.extend(argv)
+    # sys.argv.extend(argv)
 
-    args = Args.from_args()
+    args = Args.from_args(argv)
+
+    assert args.arch == arch
+    assert args.data == data
+    assert args.num_workers == num_workers
+
+
+def test_known_args():
+    data = '/path/to/dataset'
+    arch = 'resnet50'
+    num_workers = 8
+
+    argv = f'{data} -a {arch} --workers {num_workers}'.split()
+
+    # sys.argv.extend(argv)
+
+    args = Args.from_known_args(argv)
 
     assert args.arch == arch
     assert args.data == data
@@ -46,4 +62,5 @@ def test_args():
 
 
 if __name__ == "__main__":
-    test_args()
+    # test_args()
+    test_known_args()
