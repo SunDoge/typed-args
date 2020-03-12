@@ -1,9 +1,8 @@
-import argparse
+import logging
 import sys
 from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
-import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -25,11 +24,23 @@ logging.basicConfig(level=logging.DEBUG)
 
 @dataclass
 class Args(TypedArgs):
-    data: str = add_argument('data', metavar='DIR', help='path to dataset')
-    arch: str = add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
-                             help='model architecture (default: resnet18)')
-    num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
-                                    help='number of data loading workers (default: 4)')
+    data: str = add_argument(
+        'data',
+        metavar='DIR',
+        help='path to dataset'
+    )
+    arch: str = add_argument(
+        '-a', '--arch',
+        metavar='ARCH',
+        default='resnet18',
+        help='model architecture (default: resnet18)'
+    )
+    num_workers: int = add_argument(
+        '-j', '--workers',
+        default=4,
+        metavar='N',
+        help='number of data loading workers (default: 4)'
+    )
 
 
 def test_args():
