@@ -15,14 +15,12 @@ class TypedArgs:
     @classmethod
     def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args = cls()
-        typed_args.add_arguments()
         typed_args.parse_args(args=args, namespace=namespace)
         return typed_args
 
     @classmethod
     def from_known_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args = cls()
-        typed_args.add_arguments()
         typed_args.parse_known_args(args=args, namespace=namespace)
         return typed_args
 
@@ -65,10 +63,12 @@ class TypedArgs:
             )
 
     def parse_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
+        self.add_arguments()
         parsed_args = self.parser.parse_args(args=args, namespace=namespace)
         self.update_arguments(parsed_args)
 
     def parse_known_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
+        self.add_arguments()
         parsed_args, _ = self.parser.parse_known_args(args=args, namespace=namespace)
         self.update_arguments(parsed_args)
 
