@@ -2,8 +2,8 @@ dist: xenial
 language: python
 # I only use these versions.
 python:
-  - "3.6"
   - "3.7"
+  - "3.8"
 install:
   - pip install dataclasses
 script:
