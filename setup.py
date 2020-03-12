@@ -33,7 +33,7 @@ def read_long_description():
 VERSION = find_version('typed_args', '__init__.py')
 
 requirements = [
-
+    'dataclasses'
 ]
 
 setup(
