@@ -14,7 +14,7 @@ pip install typed-args
 
 From github
 ```bash
-pip install git+https://github.com/SunDoge/typed-args.git
+pip install git+https://github.com/SunDoge/typed-args.git@v0.3
 ```
 
 ## Usage
