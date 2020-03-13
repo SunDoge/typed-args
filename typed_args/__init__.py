@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Union, Optional, Any, Iterable, List, Tuple
 import typing
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 LOGGER = logging.getLogger(__name__)
 
