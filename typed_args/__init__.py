@@ -30,62 +30,39 @@ class TypedArgs:
             self.add_argument(name, annotation)
 
     def add_argument(self, name: str, annotation: Any):
-        phantom_actions = getattr(self, name)
-
-        LOGGER.debug('phantom action = %s', phantom_actions)
+        local_variables = getattr(self, name)
 
         # if multiple actions are added to one dest, we will have more than on actions
         # 统一把action变成iterable
-        if isinstance(phantom_actions, PhantomAction):
-            phantom_actions = [phantom_actions]
 
-        for phantom_action_index, phantom_action in enumerate(phantom_actions):
-            # Use action type if possible
-            # if action='append', multiple actions are added to one dest
-            if isinstance(annotation, typing._GenericAlias):
-                if annotation._name == 'List':
-                    argument_type = annotation.__args__[0]
-                if annotation._name == 'Tuple':
-                    if annotation.__args__[-1] == Ellipsis:
-                        argument_type = annotation.__args__[0]
-                    else:
-                        argument_type = annotation.__args__[
-                            phantom_action_index
-                        ]
-            else:
-                argument_type = annotation
+        if isinstance(annotation, type(List)):
+            if annotation._name == 'List':
+                if type(local_variables) == tuple:
+                    # 绝对不会是positional
+                    types = annotation.__args__[0].__args__
 
-            if phantom_action.option_strings[0].startswith('-'):
-                # optional argument
-                self.parser.add_argument(
-                    *phantom_action.option_strings,
-                    action=phantom_action.action,
-                    nargs=phantom_action.nargs,
-                    const=phantom_action.const,
-                    default=phantom_action.default,
-                    type=argument_type,  # use annotated type
-                    choices=phantom_action.choices,
-                    required=phantom_action.required,
-                    help=phantom_action.help,
-                    metavar=phantom_action.metavar,
-                    dest=name,  # use attribute name
-                )
-            else:
-                # No dest
-                # for positional argument actions, dest is normally supplied as the first argument to add_argument()
-                # No required
-                self.parser.add_argument(
-                    # positional arg has only one str input
-                    phantom_action.option_strings[0],
-                    action=phantom_action.action,
-                    nargs=phantom_action.nargs,
-                    const=phantom_action.const,
-                    default=phantom_action.default,
-                    type=argument_type,  # use annotated type
-                    choices=phantom_action.choices,
-                    help=phantom_action.help,
-                    metavar=phantom_action.metavar,
-                )
+                    for t, v in zip(types, local_variables):
+                        v = v.default_factory()
+
+                        v['kwargs']['dest'] = name
+
+                        # v['kwargs']['type'] = t
+                        if not v['kwargs']['action'].endswith('const'):
+                            v['kwargs']['type'] = t
+
+                        self.parser.add_argument(*v['args'], **v['kwargs'])
+                else:
+                    if local_variables['args'][0].startswith('-'):
+                        local_variables['kwargs']['dest'] = name
+                    local_variables['kwargs']['type'] = annotation.__args__[0]
+                    self.parser.add_argument(
+                        *local_variables['args'], **local_variables['kwargs'])
+        else:
+            if local_variables['args'][0].startswith('-'):
+                local_variables['kwargs']['dest'] = name
+            local_variables['kwargs']['type'] = annotation
+            self.parser.add_argument(
+                *local_variables['args'], **local_variables['kwargs'])
 
     def parse_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         self.add_arguments()
@@ -104,29 +81,23 @@ class TypedArgs:
             setattr(self, name, value)
 
 
-@dataclass
-class PhantomAction:
-    option_strings: Tuple[str, ...]
-    action: Optional[str] = None
-    nargs: Union[int, str, None] = None
-    const: Any = None
-    default: Any = None
-    choices: Optional[Iterable] = None
-    required: Optional[bool] = None
-    help: Optional[str] = None
-    metavar: Optional[str] = None
+# @dataclass
+# class PhantomAction:
+#     option_strings: Tuple[str, ...]
+#     action: Optional[str] = None
+#     nargs: Union[int, str, None] = None
+#     const: Any = None
+#     default: Any = None
+#     choices: Optional[Iterable] = None
+#     required: Optional[bool] = None
+#     help: Optional[str] = None
+#     metavar: Optional[str] = None
 
 
-def add_argument(
-        *option_strings: Union[str, Tuple[str, ...]],
-        action: Optional[str] = None,
-        nargs: Union[int, str, None] = None,
-        const: Any = None,
-        default: Any = None,
-        choices: Optional[Iterable] = None,
-        required: Optional[bool] = None,
-        help: Optional[str] = None,
-        metavar: Optional[str] = None,
-):
-    LOGGER.debug('locals = %s', locals())
-    return PhantomAction(**locals())
+def add_argument(*args, **kwargs):
+
+    local_variables = locals()
+
+    LOGGER.debug('locals = %s', local_variables)
+
+    return field(default_factory=lambda: local_variables)

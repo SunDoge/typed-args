@@ -1,6 +1,6 @@
 from typed_args import TypedArgs, add_argument
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 
 def test_append():
@@ -14,20 +14,20 @@ def test_append():
 
 
 def test_same_dest():
-    # @dataclass
-    # class Args(TypedArgs):
-    #     types: Tuple[str, int] = (
-    #         add_argument('--str', action='append_const', const=str),
-    #         add_argument('--int', action='append_const', const=int)
-    #     )
+    @dataclass
+    class Args(TypedArgs):
+        types: List[Union[str, int]] = (
+            add_argument('--str', action='append_const', const=str),
+            add_argument('--int', action='append_const', const=int)
+        )
 
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--str', dest='types', action='append_const', const=str)
-    parser.add_argument('--int', dest='types', action='append_const', const=int)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--str', dest='types', action='append_const', const=str)
+    # parser.add_argument('--int', dest='types', action='append_const', const=int)
 
-    # args = Args.from_args('--str --int'.split())
+    args = Args.from_args('--str --int'.split())
     # args = parser.parse_args('--str --int'.split())
-    args = parser.parse_args('--int --str'.split())
+    # args = parser.parse_args('--int --str'.split())
 
     assert args.types == [str, int]
