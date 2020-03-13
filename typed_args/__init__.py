@@ -37,6 +37,10 @@ class TypedArgs:
 
         if isinstance(annotation, type(List)):
             if annotation._name == 'List':
+                """
+                List存在两种情况，append_const需要add两次，List[Union[T1, T2]]
+                append，只add一次
+                """
                 if type(local_variables) == tuple:
                     # 绝对不会是positional
                     types = annotation.__args__[0].__args__
@@ -46,14 +50,16 @@ class TypedArgs:
 
                         v['kwargs']['dest'] = name
 
-                        # v['kwargs']['type'] = t
+                        # append_const不能输入type
                         if not v['kwargs']['action'].endswith('const'):
                             v['kwargs']['type'] = t
 
                         self.parser.add_argument(*v['args'], **v['kwargs'])
                 else:
+                    # positional不能输入dest
                     if local_variables['args'][0].startswith('-'):
                         local_variables['kwargs']['dest'] = name
+                        
                     local_variables['kwargs']['type'] = annotation.__args__[0]
                     self.parser.add_argument(
                         *local_variables['args'], **local_variables['kwargs'])
