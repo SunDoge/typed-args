@@ -3,7 +3,7 @@ from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass, field
 from typing import Union, Optional, Any, Iterable, List, Tuple
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class TypedArgs:
             args = kwargs.pop('option_strings', ())
             kwargs['dest'] = name
 
-            if kwargs['action'] in [None, 'store']:
+            if kwargs['action'] == 'store':
                 kwargs['type'] = argument_type
 
             self.parser.add_argument(*args, **kwargs)
@@ -70,7 +70,7 @@ class TypedArgs:
 @dataclass
 class PhantomAction:
     option_strings: Tuple[str, ...]
-    action: Optional[str] = None
+    action: str = 'store'
     nargs: Union[int, str, None] = None
     const: Any = None
     default: Any = None
@@ -86,54 +86,53 @@ class PhantomAction:
             # position argument is always required
             del kwargs['required']
 
-        if self.action is not None:  # otherwise it must be store action
-            if self.action.startswith('store_'):
-                del kwargs['nargs']
-                del kwargs['choices']
+        if self.action.startswith('store_'):
+            del kwargs['nargs']
+            del kwargs['choices']
 
-                if self.action in ['store_true', 'store_false']:
-                    del kwargs['metavar']
-                    del kwargs['const']
-
-            elif self.action == 'append_const':
-                del kwargs['nargs']
-                del kwargs['choices']
-
-            elif self.action == 'count':
-                del kwargs['nargs']
-                del kwargs['choices']
-                del kwargs['const']
+            if self.action in ['store_true', 'store_false']:
                 del kwargs['metavar']
-
-            elif self.action == 'help':
-                del kwargs['dest']
-                del kwargs['default']
-
-                del kwargs['nargs']
-                del kwargs['choices']
                 del kwargs['const']
-                del kwargs['metavar']
-                del kwargs['required']
 
-            elif self.action == 'version':
-                del kwargs['dest']
-                del kwargs['default']
+        elif self.action == 'append_const':
+            del kwargs['nargs']
+            del kwargs['choices']
 
-                del kwargs['nargs']
-                del kwargs['choices']
-                del kwargs['const']
-                del kwargs['metavar']
-                del kwargs['required']
+        elif self.action == 'count':
+            del kwargs['nargs']
+            del kwargs['choices']
+            del kwargs['const']
+            del kwargs['metavar']
 
-            elif self.action == 'parsers':
-                raise NotImplemented()
+        elif self.action == 'help':
+            del kwargs['dest']
+            del kwargs['default']
+
+            del kwargs['nargs']
+            del kwargs['choices']
+            del kwargs['const']
+            del kwargs['metavar']
+            del kwargs['required']
+
+        elif self.action == 'version':
+            del kwargs['dest']
+            del kwargs['default']
+
+            del kwargs['nargs']
+            del kwargs['choices']
+            del kwargs['const']
+            del kwargs['metavar']
+            del kwargs['required']
+
+        elif self.action == 'parsers':
+            raise NotImplemented()
 
         return kwargs
 
 
 def add_argument(
         *option_strings: Union[str, Tuple[str, ...]],
-        action: Optional[str] = None,
+        action: str = 'store',  # in argparse, default action is 'store'
         nargs: Union[int, str, None] = None,
         const: Optional[Any] = None,
         default: Optional[Any] = None,
@@ -142,6 +141,19 @@ def add_argument(
         help: Optional[str] = None,
         metavar: Optional[str] = None,
 ):
+    """
+
+    :param option_strings:
+    :param action:
+    :param nargs:
+    :param const:
+    :param default:
+    :param choices:
+    :param required:
+    :param help:
+    :param metavar:
+    :return:
+    """
     kwargs = locals()
     LOGGER.debug('local = ', kwargs)
 

@@ -4,8 +4,6 @@ language: python
 python:
   - "3.7"
   - "3.8"
-install:
-  - pip install dataclasses
 script:
   - pytest
 # Don't notify me on success.
