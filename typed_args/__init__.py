@@ -2,7 +2,6 @@ import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass, field
 from typing import Union, Optional, Any, Iterable, List, Tuple
-import typing
 
 __version__ = '0.3.1'
 
@@ -30,45 +29,26 @@ class TypedArgs:
             self.add_argument(name, annotation)
 
     def add_argument(self, name: str, annotation: Any):
-        local_variables = getattr(self, name)
+        values: Union[PhantomAction, Tuple[PhantomAction]] = getattr(self, name)
 
-        # if multiple actions are added to one dest, we will have more than on actions
-        # 统一把action变成iterable
-
-        if isinstance(annotation, type(List)):
-            if annotation._name == 'List':
-                """
-                List存在两种情况，append_const需要add两次，List[Union[T1, T2]]
-                append，只add一次
-                """
-                if type(local_variables) == tuple:
-                    # 绝对不会是positional
-                    types = annotation.__args__[0].__args__
-
-                    for t, v in zip(types, local_variables):
-                        v = v.default_factory()
-
-                        v['kwargs']['dest'] = name
-
-                        # append_const不能输入type
-                        if not v['kwargs']['action'].endswith('const'):
-                            v['kwargs']['type'] = t
-
-                        self.parser.add_argument(*v['args'], **v['kwargs'])
-                else:
-                    # positional不能输入dest
-                    if local_variables['args'][0].startswith('-'):
-                        local_variables['kwargs']['dest'] = name
-                        
-                    local_variables['kwargs']['type'] = annotation.__args__[0]
-                    self.parser.add_argument(
-                        *local_variables['args'], **local_variables['kwargs'])
+        if type(values) != tuple:
+            types = (annotation,)
+            values = (values,)
         else:
-            if local_variables['args'][0].startswith('-'):
-                local_variables['kwargs']['dest'] = name
-            local_variables['kwargs']['type'] = annotation
-            self.parser.add_argument(
-                *local_variables['args'], **local_variables['kwargs'])
+            types = annotation.__args__[0].__args__
+            if types[-1] == Ellipsis:
+                types = (types[0],) * len(values)
+
+        for argument_type, value in zip(types, values):
+            kwargs = value.to_kwargs()
+
+            args = kwargs.pop('option_strings', ())
+            kwargs['dest'] = name
+
+            if kwargs['action'] in [None, 'store']:
+                kwargs['type'] = argument_type
+
+            self.parser.add_argument(*args, **kwargs)
 
     def parse_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         self.add_arguments()
@@ -87,23 +67,86 @@ class TypedArgs:
             setattr(self, name, value)
 
 
-# @dataclass
-# class PhantomAction:
-#     option_strings: Tuple[str, ...]
-#     action: Optional[str] = None
-#     nargs: Union[int, str, None] = None
-#     const: Any = None
-#     default: Any = None
-#     choices: Optional[Iterable] = None
-#     required: Optional[bool] = None
-#     help: Optional[str] = None
-#     metavar: Optional[str] = None
+@dataclass
+class PhantomAction:
+    option_strings: Tuple[str, ...]
+    action: Optional[str] = None
+    nargs: Union[int, str, None] = None
+    const: Any = None
+    default: Any = None
+    choices: Optional[Iterable] = None
+    required: Optional[bool] = None
+    help: Optional[str] = None
+    metavar: Optional[str] = None
+
+    def to_kwargs(self):
+        kwargs = self.__dict__.copy()
+
+        if len(self.option_strings) == 0:
+            # position argument is always required
+            del kwargs['required']
+
+        if self.action is not None:  # otherwise it must be store action
+            if self.action.startswith('store_'):
+                del kwargs['nargs']
+                del kwargs['choices']
+
+                if self.action in ['store_true', 'store_false']:
+                    del kwargs['metavar']
+                    del kwargs['const']
+
+            elif self.action == 'append_const':
+                del kwargs['nargs']
+                del kwargs['choices']
+
+            elif self.action == 'count':
+                del kwargs['nargs']
+                del kwargs['choices']
+                del kwargs['const']
+                del kwargs['metavar']
+
+            elif self.action == 'help':
+                del kwargs['dest']
+                del kwargs['default']
+
+                del kwargs['nargs']
+                del kwargs['choices']
+                del kwargs['const']
+                del kwargs['metavar']
+                del kwargs['required']
+
+            elif self.action == 'version':
+                del kwargs['dest']
+                del kwargs['default']
+
+                del kwargs['nargs']
+                del kwargs['choices']
+                del kwargs['const']
+                del kwargs['metavar']
+                del kwargs['required']
+
+            elif self.action == 'parsers':
+                raise NotImplemented()
+
+        return kwargs
 
 
-def add_argument(*args, **kwargs):
+def add_argument(
+        *option_strings: Union[str, Tuple[str, ...]],
+        action: Optional[str] = None,
+        nargs: Union[int, str, None] = None,
+        const: Optional[Any] = None,
+        default: Optional[Any] = None,
+        choices: Optional[Iterable] = None,
+        required: Optional[bool] = None,
+        help: Optional[str] = None,
+        metavar: Optional[str] = None,
+):
+    kwargs = locals()
+    LOGGER.debug('local = ', kwargs)
 
-    local_variables = locals()
+    # print('=' * 100)
+    # print(kwargs)
+    # print('=' * 100)
 
-    LOGGER.debug('locals = %s', local_variables)
-
-    return field(default_factory=lambda: local_variables)
+    return PhantomAction(**kwargs)

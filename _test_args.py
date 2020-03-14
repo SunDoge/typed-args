@@ -4,13 +4,12 @@ from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 @dataclass
 class Args(TypedArgs):
     data: str = add_argument(
-        'data',
         metavar='DIR',
         help='path to dataset'
     )
@@ -27,6 +26,7 @@ class Args(TypedArgs):
         help='number of data loading workers (default: 4)'
     )
 
+
     # def __post_init__(self):
     #     self.parse_args()
 
@@ -40,8 +40,9 @@ def test_args():
     sys.argv.extend(argv)
 
     # args = Args.from_args()
-    # args = Args.from_known_args()
-    args = Args()
+    args = Args.from_known_args()
+    # args = Args()
+    # args = Args.from_args()
     print(args)
 
     # assert args.arch == arch
