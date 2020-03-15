@@ -3,7 +3,13 @@ from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass, field
 from typing import Union, Optional, Any, Iterable, List, Tuple
 
-__version__ = '0.3.2'
+try:
+    # Python 3.8
+    from typing import get_origin, get_args
+except ImportError:
+    from .utils import get_origin, get_args
+
+__version__ = '0.3.3'
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,11 +47,31 @@ class TypedArgs:
 
         for argument_type, value in zip(types, values):
             kwargs = value.to_kwargs()
-
             args = kwargs.pop('option_strings', ())
-            kwargs['dest'] = name
+
+            kwargs['dest'] = name  # 必定有dest
+
+            is_position_argument = len(args) == 0
+
+            origin = get_origin(argument_type)
+
+            if origin is list:
+                argument_type = get_args(argument_type)[0]
+
+                print('argument type: ', argument_type)
 
             if kwargs['action'] == 'store':
+
+                # 不存在default的才需要判断optional
+                if kwargs.get('default', None) is None:
+
+                    if origin is Union:  # Optional
+                        argument_type = get_args(argument_type)[0]
+                        kwargs['required'] = False
+                    elif origin is None:
+                        if not is_position_argument:
+                            kwargs['required'] = True
+
                 kwargs['type'] = argument_type
 
             self.parser.add_argument(*args, **kwargs)
