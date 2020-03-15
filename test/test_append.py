@@ -1,6 +1,7 @@
-from typed_args import TypedArgs, add_argument
 from dataclasses import dataclass
-from typing import List, Tuple, Union
+from typing import List, Union
+
+from typed_args import TypedArgs, add_argument
 
 
 def test_append():
@@ -21,7 +22,6 @@ def test_same_dest():
             add_argument('--int', action='append_const', const=int)
         )
 
-    import argparse
     # parser = argparse.ArgumentParser()
     # parser.add_argument('--str', dest='types', action='append_const', const=str)
     # parser.add_argument('--int', dest='types', action='append_const', const=int)
