@@ -27,3 +27,17 @@ def test_name_or_flags():
     assert args.foo == 'FOO'
 
 
+def test_action():
+    @dataclass
+    class Args1(TypedArgs):
+        foo: Optional[str] = add_argument('--foo')
+
+    args1 = Args1.from_args('--foo 1'.split())
+    assert args1.foo == '1'
+
+    @dataclass
+    class Args2(TypedArgs):
+        foo: int = add_argument('--foo', action='store_const', const=42)
+
+    args2 = Args2.from_args(['--foo'])
+    assert args2.foo == 42
