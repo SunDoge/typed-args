@@ -32,6 +32,8 @@ class TypedArgs:
 
     def add_arguments(self):
         for name, annotation in self.__annotations__.items():
+            if name == 'parser':
+                continue
             self.add_argument(name, annotation)
 
     def add_argument(self, name: str, annotation: Any):
@@ -89,6 +91,8 @@ class TypedArgs:
 
     def update_arguments(self, parsed_args: Namespace):
         for name in self.__annotations__.keys():
+            if name == 'parser':
+                continue
             value = getattr(parsed_args, name)
             setattr(self, name, value)
 
