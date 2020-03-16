@@ -1,6 +1,7 @@
 from typed_args import TypedArgs, add_argument
 from dataclasses import dataclass, field
 from typing import *
+import argparse
 
 
 def test_name_or_flags():
@@ -99,3 +100,22 @@ def test_nargs_n():
     args = Args.from_args('c --foo a b'.split())
     assert args.bar == ['c']
     assert args.foo == ['a', 'b']
+
+
+def test_nargs_optional():
+    @dataclass
+    class Args(TypedArgs):
+        foo: str = add_argument('--foo', nargs='?', const='c', default='d')
+        bar: str = add_argument(nargs='?', default='d')
+
+    args = Args.from_args(['XX', '--foo', 'YY'])
+    assert args.foo == 'YY'
+    assert args.bar == 'XX'
+
+    args = Args.from_args(['XX', '--foo'])
+    assert args.foo == 'c'
+    assert args.bar == 'XX'
+
+    args = Args.from_args()
+    assert args.foo == 'd'
+    assert args.bar == 'd'
