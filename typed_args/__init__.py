@@ -123,6 +123,7 @@ class PhantomAction:
             if self.action in ['store_true', 'store_false']:
                 del kwargs['metavar']
                 del kwargs['const']
+                del kwargs['default']
 
         elif self.action == 'append_const':
             del kwargs['nargs']

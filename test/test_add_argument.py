@@ -41,3 +41,31 @@ def test_action():
 
     args2 = Args2.from_args(['--foo'])
     assert args2.foo == 42
+
+    @dataclass
+    class Args3(TypedArgs):
+        foo: bool = add_argument('--foo', action='store_true')
+        bar: bool = add_argument('--bar', action='store_false')
+        baz: bool = add_argument('--baz', action='store_false')
+
+    args3 = Args3.from_args('--foo --bar'.split())
+    assert args3.foo == True
+    assert args3.bar == False
+    assert args3.baz == True
+
+    @dataclass
+    class Args4(TypedArgs):
+        foo: List[str] = add_argument('--foo', action='append')
+
+    args4 = Args4.from_args('--foo 1 --foo 2'.split())
+    assert args4.foo == ['1', '2']
+
+    @dataclass
+    class Args5(TypedArgs):
+        types: List[Union[str, int]] = (
+            add_argument('--str', action='append_const', const=str),
+            add_argument('--int', action='append_const', const=int)
+        )
+
+    args5 = Args5.from_args('--str --int'.split())
+    assert args5.types == [str, int]
