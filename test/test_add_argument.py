@@ -27,7 +27,7 @@ def test_name_or_flags():
     assert args.foo == 'FOO'
 
 
-def test_action():
+def test_action_store():
     @dataclass
     class Args1(TypedArgs):
         foo: Optional[str] = add_argument('--foo')
@@ -35,6 +35,8 @@ def test_action():
     args1 = Args1.from_args('--foo 1'.split())
     assert args1.foo == '1'
 
+
+def test_action_score_const():
     @dataclass
     class Args2(TypedArgs):
         foo: int = add_argument('--foo', action='store_const', const=42)
@@ -42,6 +44,8 @@ def test_action():
     args2 = Args2.from_args(['--foo'])
     assert args2.foo == 42
 
+
+def test_action_store_true_false():
     @dataclass
     class Args3(TypedArgs):
         foo: bool = add_argument('--foo', action='store_true')
@@ -53,6 +57,8 @@ def test_action():
     assert args3.bar == False
     assert args3.baz == True
 
+
+def test_action_append():
     @dataclass
     class Args4(TypedArgs):
         foo: List[str] = add_argument('--foo', action='append')
@@ -60,6 +66,8 @@ def test_action():
     args4 = Args4.from_args('--foo 1 --foo 2'.split())
     assert args4.foo == ['1', '2']
 
+
+def test_action_append_const():
     @dataclass
     class Args5(TypedArgs):
         types: List[Union[str, int]] = (
@@ -69,3 +77,25 @@ def test_action():
 
     args5 = Args5.from_args('--str --int'.split())
     assert args5.types == [str, int]
+
+
+def test_action_count():
+    @dataclass
+    class Args(TypedArgs):
+        verbose: int = add_argument('--verbose', '-v', action='count', default=0)
+
+    args = Args.from_args(['-vvv'])
+    assert args.verbose == 3
+
+
+# TODO help, version, extend
+
+def test_nargs_n():
+    @dataclass
+    class Args(TypedArgs):
+        foo: List[str] = add_argument('--foo', nargs=2)
+        bar: List[str] = add_argument(nargs=1)
+
+    args = Args.from_args('c --foo a b'.split())
+    assert args.bar == ['c']
+    assert args.foo == ['a', 'b']
