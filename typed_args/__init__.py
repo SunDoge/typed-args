@@ -9,7 +9,7 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 
 LOGGER = logging.getLogger(__name__)
 
