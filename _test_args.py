@@ -31,6 +31,11 @@ class Args(TypedArgs):
     #     self.parse_args()
 
 
+@dataclass
+class Args1(Args):
+    foo: str = add_argument('--foo')
+
+
 def test_args():
     data = '/path/to/dataset'
     arch = 'resnet50'
@@ -41,7 +46,8 @@ def test_args():
     sys.argv.extend(argv)
 
     # args = Args.from_args()
-    args = Args.from_known_args()
+    # args = Args.from_known_args()
+    args = Args1.from_args()
     # args = Args()
     # args = Args.from_args()
     print(args)
@@ -52,6 +58,6 @@ def test_args():
 
 
 if __name__ == "__main__":
-    # test_args()
-    from test.test_add_argument import *
-    test_name_or_flags()
+    test_args()
+    # from test.test_add_argument import *
+    # test_name_or_flags()

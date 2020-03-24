@@ -9,7 +9,7 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.3.4'
+__version__ = '0.3.5'
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,10 +31,10 @@ class TypedArgs:
         return typed_args
 
     def add_arguments(self):
-        for name, annotation in self.__annotations__.items():
+        for name, annotation in self.__dataclass_fields__.items():
             if name == 'parser':
                 continue
-            self.add_argument(name, annotation)
+            self.add_argument(name, annotation.type)
 
     def add_argument(self, name: str, annotation: Any):
         values: Union[PhantomAction, Tuple[PhantomAction]] = getattr(self, name)
@@ -90,7 +90,7 @@ class TypedArgs:
         self.update_arguments(parsed_args)
 
     def update_arguments(self, parsed_args: Namespace):
-        for name in self.__annotations__.keys():
+        for name in self.__dataclass_fields__.keys():
             if name == 'parser':
                 continue
             value = getattr(parsed_args, name)
