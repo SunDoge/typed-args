@@ -8,7 +8,7 @@ def test_optional_argument():
     class Args(TypedArgs):
         config: Optional[str] = add_argument('-c', '--config')
 
-    args = Args.from_args()
+    args = Args.from_args([])
 
     assert args.config == None
 
@@ -22,7 +22,7 @@ def test_optional_with_default():
     class Args(TypedArgs):
         config: str = add_argument('-c', '--config', default='/path')
 
-    args = Args.from_args()
+    args = Args.from_args([])
 
     assert args.config == '/path'
 

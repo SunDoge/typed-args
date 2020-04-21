@@ -9,7 +9,7 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.3.5'
+__version__ = '0.3.6'
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class TypedArgs:
             if origin is list:
                 argument_type = get_args(argument_type)[0]
 
-                print('argument type: ', argument_type)
+                # print('argument type: ', argument_type)
 
             if kwargs['action'] == 'store':
 
@@ -96,6 +96,7 @@ class TypedArgs:
             value = getattr(parsed_args, name)
             setattr(self, name, value)
 
+        del self.parser
 
 @dataclass
 class PhantomAction:

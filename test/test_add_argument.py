@@ -116,6 +116,6 @@ def test_nargs_optional():
     assert args.foo == 'c'
     assert args.bar == 'XX'
 
-    args = Args.from_args()
+    args = Args.from_args([])
     assert args.foo == 'd'
     assert args.bar == 'd'
