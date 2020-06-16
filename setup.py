@@ -33,7 +33,6 @@ def read_long_description():
 VERSION = find_version('typed_args', '__init__.py')
 
 requirements = [
-    'dataclasses'
 ]
 
 setup(
@@ -41,6 +40,7 @@ setup(
     version=VERSION,
     author='SunDoge',
     author_email='384813529@qq.com',
+    description='argparse with type annotations',
     long_description=read_long_description(),
     long_description_content_type='text/markdown',
     url='https://github.com/SunDoge/typedargs',

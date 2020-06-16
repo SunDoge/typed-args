@@ -5,7 +5,7 @@ from typed_args import TypedArgs, add_argument
 
 @dataclass
 class Args(TypedArgs):
-    data: str = add_argument('data', metavar='DIR', help='path to dataset')
+    data: str = add_argument(metavar='DIR', help='path to dataset')
     arch: str = add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                              help='model architecture (default: resnet18)')
     num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
@@ -21,7 +21,7 @@ def test_args():
 
     # sys.argv.extend(argv)
 
-    args = Args.from_args(argv)
+    args = Args.from_known_args(argv)
 
     assert args.arch == arch
     assert args.data == data
@@ -37,7 +37,7 @@ def test_known_args():
 
     # sys.argv.extend(argv)
 
-    args = Args.from_known_args(argv)
+    args = Args.from_args(argv)
 
     assert args.arch == arch
     assert args.data == data

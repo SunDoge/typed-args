@@ -1,35 +1,39 @@
-import argparse
+import logging
 import sys
 from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
 
 
-# class Args(TypedArgs):
-#
-#     def __init__(self):
-#         parser = argparse.ArgumentParser()
-#
-#         self.data: ArgType[str] = parser.add_argument('data', metavar='DIR',
-#                                                       help='path to dataset')
-#         self.arch: ArgType[str] = parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
-#                                                       help='model architecture: ' +
-#                                                            ' (default: resnet18)')
-#         self.num_workers: ArgType[int] = parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
-#                                                              help='number of data loading workers (default: 4)')
-#
-#         self.parse_args_from(parser)
+# logging.basicConfig(level=logging.DEBUG)
+
 
 @dataclass
 class Args(TypedArgs):
-    data: str = add_argument('data', metavar='DIR', help='path to dataset')
-    arch: str = add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
-                             help='model architecture (default: resnet18)')
-    num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
-                                    help='number of data loading workers (default: 4)')
+    data: str = add_argument(
+        metavar='DIR',
+        help='path to dataset'
+    )
+    arch: str = add_argument(
+        '-a', '--arch',
+        metavar='ARCH',
+        default='resnet18',
+        help='model architecture (default: resnet18)'
+    )
+    num_workers: int = add_argument(
+        '-j', '--workers',
+        default=4,
+        metavar='N',
+        help='number of data loading workers (default: 4)'
+    )
+
+    # def __post_init__(self):
+    #     self.parse_args()
+
+
+@dataclass
+class Args1(Args):
+    foo: str = add_argument('--foo')
 
 
 def test_args():
@@ -41,13 +45,19 @@ def test_args():
 
     sys.argv.extend(argv)
 
-    args = Args.from_args()
-    args = Args.from_known_args()
+    # args = Args.from_args()
+    # args = Args.from_known_args()
+    args = Args1.from_args()
+    # args = Args()
+    # args = Args.from_args()
+    print(args)
 
-    assert args.arch == arch
-    assert args.data == data
-    assert args.num_workers == num_workers
+    # assert args.arch == arch
+    # assert args.data == data
+    # assert args.num_workers == num_workers
 
 
 if __name__ == "__main__":
     test_args()
+    # from test.test_add_argument import *
+    # test_name_or_flags()
