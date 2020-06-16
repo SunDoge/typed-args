@@ -13,7 +13,8 @@ def test_name_or_flags():
     import argparse
     @dataclass
     class Args(TypedArgs):
-        parser: argparse.ArgumentParser = field(default_factory=lambda: argparse.ArgumentParser(prog='PROG'))
+        parser: argparse.ArgumentParser = field(
+            default_factory=lambda: argparse.ArgumentParser(prog='PROG'))
         foo: Optional[str] = add_argument('-f', '--foo')
         bar: str = add_argument()
 
@@ -83,7 +84,8 @@ def test_action_append_const():
 def test_action_count():
     @dataclass
     class Args(TypedArgs):
-        verbose: int = add_argument('--verbose', '-v', action='count', default=0)
+        verbose: int = add_argument(
+            '--verbose', '-v', action='count', default=0)
 
     args = Args.from_args(['-vvv'])
     assert args.verbose == 3
@@ -119,3 +121,50 @@ def test_nargs_optional():
     args = Args.from_args([])
     assert args.foo == 'd'
     assert args.bar == 'd'
+
+
+def test_nargs_optional_input_and_output_files():
+    pass
+
+
+def test_nargs_zero_or_more():
+    @dataclass
+    class Args(TypedArgs):
+        foo: List[str] = add_argument('--foo', nargs='*')
+        bar: List[str] = add_argument('--bar', nargs='*')
+        baz: List[str] = add_argument(nargs='*')
+
+    args = Args.from_args('a b --foo x y --bar 1 2'.split())
+
+    assert args.bar == ['1', '2']
+    assert args.baz == ['a', 'b']
+    assert args.foo == ['x', 'y']
+
+
+def test_nargs_one_or_more():
+    @dataclass
+    class Args(TypedArgs):
+        foo: List[str] = add_argument(nargs='+')
+
+    args = Args.from_args(['a', 'b'])
+    assert args.foo == ['a', 'b']
+
+
+def test_nargs_remainder():
+    @dataclass
+    class Args(TypedArgs):
+        foo: str = add_argument('--foo')
+        command: str = add_argument()
+        args: List[str] = add_argument(nargs=argparse.REMAINDER)
+
+    args = Args.from_args('--foo B cmd --arg1 XX ZZ'.split())
+    assert args.foo == 'B'
+    assert args.command == 'cmd'
+    assert args.args == ['--arg1', 'XX', 'ZZ']
+
+
+def test_default():
+    """
+    TODO
+    """
+    pass
