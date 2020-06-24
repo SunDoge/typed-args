@@ -21,7 +21,7 @@ def test_args():
 
     # sys.argv.extend(argv)
 
-    args = Args.from_known_args(argv)
+    args, _ = Args.from_known_args(argv)
 
     assert args.arch == arch
     assert args.data == data

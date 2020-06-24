@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.7]
+- Fix `repr`.
 
 ## [0.3.6]
 - Support `pickle`.
@@ -27,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [Unreleased]: https://github.com/SunDoge/typed-args
+[0.3.7]: https://github.com/SunDoge/typed-args/tree/v0.3.7
 [0.3.6]: https://github.com/SunDoge/typed-args/tree/v0.3.6
 [0.3.0]: https://github.com/SunDoge/typed-args/tree/v0.3
 [0.2.0]: https://github.com/SunDoge/typed-args/tree/v0.2

@@ -43,11 +43,11 @@ def test_args():
 
     argv = f'{data} -a {arch} --workers {num_workers}'.split()
 
-    sys.argv.extend(argv)
+    # sys.argv.extend(argv)
 
-    # args = Args.from_args()
+    args = Args.from_args(argv)
     # args = Args.from_known_args()
-    args = Args1.from_args()
+    # args = Args1.from_args(argv)
     # args = Args()
     # args = Args.from_args()
     print(args)
