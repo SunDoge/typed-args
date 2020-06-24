@@ -11,7 +11,7 @@ except ImportError:
 
 __version__ = '0.3.7'
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -191,7 +191,7 @@ def add_argument(
     :return:
     """
     kwargs = locals()
-    LOGGER.debug('local = ', kwargs)
+    logger.debug('local = ', kwargs)
 
     # print('=' * 100)
     # print(kwargs)
