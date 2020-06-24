@@ -45,7 +45,7 @@ class Args(TypedArgs):
         """
         anothor way to init
         """
-        self.parse_args()
+        self._parse_args()
 
 
 def test_args():
