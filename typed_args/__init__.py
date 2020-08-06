@@ -109,8 +109,8 @@ class TypedArgs:
 
     def _update_arguments(self, parsed_args: Namespace):
         for name in self.__dataclass_fields__.keys():
-            if name == 'parser':
-                continue
+            # if name == 'parser':
+            #     continue
             value = getattr(parsed_args, name)
             setattr(self, name, value)
 
@@ -121,7 +121,7 @@ class TypedArgs:
 
 def get_inner_types(annotation):
     """
-    Tuple[int, int] -> get int
+    List[Union[int, str]] -> get (int, str)
     """
     return annotation.__args__[0].__args__
 
@@ -233,7 +233,6 @@ def default_parser_factory() -> ArgumentParser:
 
 def typed_args(_cls: TypedArgs = None, *, parser_factory: Callable[[], ArgumentParser] = default_parser_factory,
                use_dataclass=True):
-
     def wrap(cls):
         return _process_class(cls, parser_factory=parser_factory, use_dataclass=use_dataclass)
 
@@ -242,18 +241,20 @@ def typed_args(_cls: TypedArgs = None, *, parser_factory: Callable[[], ArgumentP
 
     return wrap(_cls)
 
-def _process_class(cls, parser_factory: Callable[[], ArgumentParser] = default_parser_factory,
-               use_dataclass=True):
 
+def _process_class(cls, parser_factory: Callable[[], ArgumentParser] = default_parser_factory,
+                   use_dataclass=True):
     if use_dataclass:
         cls = dataclass(cls)
 
+    @classmethod
     def from_args(cls: Callable, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args: TypedArgs = cls()
         parser = parser_factory()
         typed_args._parse_args(parser, args=args, namespace=namespace)
         return typed_args
 
+    @classmethod
     def from_known_args(cls: Callable, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args: TypedArgs = cls()
         parser = parser_factory()
@@ -261,8 +262,8 @@ def _process_class(cls, parser_factory: Callable[[], ArgumentParser] = default_p
         return typed_args, args
 
     # print('cls:', cls.from_args)
-    cls.from_args = classmethod(from_args)
-    cls.from_known_args = classmethod(from_known_args)
+    cls.from_args = from_args
+    cls.from_known_args = from_known_args
     # setattr(cls, 'from_know')
 
     return cls
