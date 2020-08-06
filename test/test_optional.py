@@ -1,10 +1,9 @@
-from typed_args import TypedArgs, add_argument
-from dataclasses import dataclass
+from typed_args import TypedArgs, add_argument, typed_args
 from typing import Optional
 
 
 def test_optional_argument():
-    @dataclass
+    @typed_args
     class Args(TypedArgs):
         config: Optional[str] = add_argument('-c', '--config')
 
@@ -18,7 +17,7 @@ def test_optional_argument():
 
 
 def test_optional_with_default():
-    @dataclass
+    @typed_args
     class Args(TypedArgs):
         config: str = add_argument('-c', '--config', default='/path')
 

@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from typing import List, Union
 
-from typed_args import TypedArgs, add_argument
+from typed_args import TypedArgs, add_argument, typed_args
 
 
 def test_append():
-    @dataclass
+    @typed_args()
     class Args(TypedArgs):
         foo: List[str] = add_argument('--foo', action='append')
 
@@ -15,7 +15,7 @@ def test_append():
 
 
 def test_same_dest():
-    @dataclass
+    @typed_args()
     class Args(TypedArgs):
         types: List[Union[str, int]] = (
             add_argument('--str', action='append_const', const=str),

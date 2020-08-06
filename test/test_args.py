@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from typed_args import TypedArgs, add_argument
+from typed_args import TypedArgs, add_argument, typed_args
 
 
-@dataclass
+@typed_args()
 class Args(TypedArgs):
     data: str = add_argument(metavar='DIR', help='path to dataset')
     arch: str = add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
