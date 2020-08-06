@@ -28,6 +28,7 @@ pip install dataclasses
 ## Usage
 
 ```python
+import argparse
 from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
@@ -41,11 +42,11 @@ class Args(TypedArgs):
     num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
                                     help='number of data loading workers (default: 4)')
 
-    def __post_init__(self):
-        """
-        anothor way to init
-        """
-        self._parse_args()
+    # def __post_init__(self):
+    #     self._parse_args(self.parser_factory())
+
+    def parser_factory(self):
+        return argparse.ArgumentParser('PROG')
 
 
 def test_args():
@@ -55,9 +56,9 @@ def test_args():
 
     argv = f'{data} -a {arch} --workers {num_workers}'.split()
 
-    args = Args.from_args(argv)
+    args = Args.from_args(argv)  # Recommanded
 
-    args1 = Args() # if __post_init__ is defined
+    # _args = Args()  # if __post_init__ is defined
 
     assert args.arch == arch
     assert args.data == data

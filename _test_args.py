@@ -2,7 +2,7 @@ import logging
 import sys
 from dataclasses import dataclass
 
-from typed_args import TypedArgs, add_argument, typed_args
+from typed_args import TypedArgs, add_argument
 import argparse
 
 
@@ -30,10 +30,10 @@ class Args(TypedArgs):
         help='number of data loading workers (default: 4)'
     )
 
-    # def __post_init__(self):
-    #     self.parse_args()
+    def __post_init__(self):
+        self._parse_args(self.parser_factory())
 
-    def get_parser(self):
+    def parser_factory(self):
         return argparse.ArgumentParser('PROG')
 
 @dataclass
@@ -53,8 +53,8 @@ def test_args():
     # args = Args.from_args(argv)
     # args = Args.from_known_args()
     # args = Args1.from_args(argv)
-    # args = Args()
-    args = Args.from_args()
+    args = Args()
+    # args = Args.from_args()
     print(args)
 
     # assert args.arch == arch
@@ -67,4 +67,3 @@ if __name__ == "__main__":
     # from test.test_add_argument import *
     # test_name_or_flags()
 
-    from jax import jit

@@ -1,7 +1,7 @@
 import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
-from typing import Union, Optional, Any, Iterable, List, Tuple, Callable
+from typing import Union, Optional, Any, Iterable, List, Tuple
 
 try:
     # Python 3.8
