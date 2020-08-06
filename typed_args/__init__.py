@@ -11,12 +11,12 @@ except ImportError:
 
 __version__ = '0.3.6'
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
 class TypedArgs:
-    parser: ArgumentParser = field(default_factory=ArgumentParser)
+    # parser: ArgumentParser = field(default_factory=ArgumentParser)
 
     @classmethod
     def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
@@ -111,6 +111,9 @@ class PhantomAction:
     metavar: Optional[str] = None
 
     def to_kwargs(self):
+        """
+        Follow the argparse.add_argument rules
+        """
         kwargs = self.__dict__.copy()
 
         if len(self.option_strings) == 0:
@@ -187,10 +190,14 @@ def add_argument(
     :return:
     """
     kwargs = locals()
-    LOGGER.debug('local = ', kwargs)
+    logger.debug('local = ', kwargs)
 
     # print('=' * 100)
     # print(kwargs)
     # print('=' * 100)
 
     return PhantomAction(**kwargs)
+
+
+def typed_args(cls: TypedArgs, parser: ArgumentParser = ArgumentParser()):
+    pass
