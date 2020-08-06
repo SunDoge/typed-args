@@ -1,4 +1,4 @@
-from typed_args import TypedArgs, add_argument, typed_args
+from typed_args import TypedArgs, add_argument, dataclass
 from typing import *
 import argparse
 
@@ -10,7 +10,7 @@ def test_name_or_flags():
     :return:
     """
 
-    @typed_args(parser_factory=lambda : argparse.ArgumentParser(prog='PROG'))
+    @dataclass()
     class Args(TypedArgs):
         foo: Optional[str] = add_argument('-f', '--foo')
         bar: str = add_argument()
@@ -27,7 +27,7 @@ def test_name_or_flags():
 
 
 def test_action_store():
-    @typed_args
+    @dataclass
     class Args1(TypedArgs):
         foo: Optional[str] = add_argument('--foo')
 
@@ -36,7 +36,7 @@ def test_action_store():
 
 
 def test_action_score_const():
-    @typed_args
+    @dataclass
     class Args2(TypedArgs):
         foo: int = add_argument('--foo', action='store_const', const=42)
 
@@ -45,7 +45,7 @@ def test_action_score_const():
 
 
 def test_action_store_true_false():
-    @typed_args
+    @dataclass
     class Args3(TypedArgs):
         foo: bool = add_argument('--foo', action='store_true')
         bar: bool = add_argument('--bar', action='store_false')
@@ -58,7 +58,7 @@ def test_action_store_true_false():
 
 
 def test_action_append():
-    @typed_args
+    @dataclass
     class Args4(TypedArgs):
         foo: List[str] = add_argument('--foo', action='append')
 
@@ -67,7 +67,7 @@ def test_action_append():
 
 
 def test_action_append_const():
-    @typed_args
+    @dataclass
     class Args5(TypedArgs):
         types: List[Union[str, int]] = (
             add_argument('--str', action='append_const', const=str),
@@ -79,7 +79,7 @@ def test_action_append_const():
 
 
 def test_action_count():
-    @typed_args
+    @dataclass
     class Args(TypedArgs):
         verbose: int = add_argument(
             '--verbose', '-v', action='count', default=0)
@@ -91,7 +91,7 @@ def test_action_count():
 # TODO help, version, extend
 
 def test_nargs_n():
-    @typed_args
+    @dataclass
     class Args(TypedArgs):
         foo: List[str] = add_argument('--foo', nargs=2)
         bar: List[str] = add_argument(nargs=1)
@@ -102,7 +102,7 @@ def test_nargs_n():
 
 
 def test_nargs_optional():
-    @typed_args
+    @dataclass
     class Args(TypedArgs):
         foo: str = add_argument('--foo', nargs='?', const='c', default='d')
         bar: str = add_argument(nargs='?', default='d')
@@ -125,7 +125,7 @@ def test_nargs_optional_input_and_output_files():
 
 
 def test_nargs_zero_or_more():
-    @typed_args
+    @dataclass
     class Args(TypedArgs):
         foo: List[str] = add_argument('--foo', nargs='*')
         bar: List[str] = add_argument('--bar', nargs='*')
@@ -139,7 +139,7 @@ def test_nargs_zero_or_more():
 
 
 def test_nargs_one_or_more():
-    @typed_args
+    @dataclass
     class Args(TypedArgs):
         foo: List[str] = add_argument(nargs='+')
 
@@ -148,7 +148,7 @@ def test_nargs_one_or_more():
 
 
 def test_nargs_remainder():
-    @typed_args
+    @dataclass
     class Args(TypedArgs):
         foo: str = add_argument('--foo')
         command: str = add_argument()

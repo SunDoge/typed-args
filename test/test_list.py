@@ -1,4 +1,4 @@
-from typed_args import TypedArgs, add_argument, typed_args
+from typed_args import TypedArgs, add_argument, dataclass
 from typing import List
 
 
@@ -8,7 +8,7 @@ def test_list():
     :return:
     """
 
-    @typed_args()
+    @dataclass()
     class Args(TypedArgs):
         foo: List[str] = add_argument('--foo', nargs=2)
         bar: List[str] = add_argument(nargs=1)

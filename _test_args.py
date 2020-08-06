@@ -10,7 +10,8 @@ import argparse
 
 
 # @typed_args(parser_factory=lambda: argparse.ArgumentParser("FUCK"))
-@typed_args()
+# @typed_args()
+@dataclass()
 class Args(TypedArgs):
     data: str = add_argument(
         metavar='DIR',
@@ -32,6 +33,8 @@ class Args(TypedArgs):
     # def __post_init__(self):
     #     self.parse_args()
 
+    def get_parser(self):
+        return argparse.ArgumentParser('PROG')
 
 @dataclass
 class Args1(Args):

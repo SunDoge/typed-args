@@ -1,15 +1,19 @@
 from dataclasses import dataclass
 
-from typed_args import TypedArgs, add_argument, typed_args
+from typed_args import TypedArgs, add_argument, dataclass
+import argparse
 
 
-@typed_args()
+@dataclass()
 class Args(TypedArgs):
     data: str = add_argument(metavar='DIR', help='path to dataset')
     arch: str = add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                              help='model architecture (default: resnet18)')
     num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
                                     help='number of data loading workers (default: 4)')
+
+    def get_parser(self):
+        return argparse.ArgumentParser(prog='PROG')
 
 
 def test_args():

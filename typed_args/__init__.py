@@ -2,7 +2,6 @@ import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
 from typing import Union, Optional, Any, Iterable, List, Tuple, Callable
-import types
 
 try:
     # Python 3.8
@@ -21,17 +20,18 @@ class TypedArgs:
 
     @classmethod
     def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
-        # typed_args = cls()
-        # typed_args._parse_args(args=args, namespace=namespace)
-        # return typed_args
-        pass
+        typed_args = cls()
+        typed_args._parse_args(typed_args.parser_factory(), args=args, namespace=namespace)
+        return typed_args
 
     @classmethod
     def from_known_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
-        # typed_args = cls()
-        # args = typed_args._parse_known_args(args=args, namespace=namespace)
-        # return typed_args, args
-        pass
+        typed_args = cls()
+        args = typed_args._parse_known_args(typed_args.parser_factory(), args=args, namespace=namespace)
+        return typed_args, args
+
+    def parser_factory(self):
+        return ArgumentParser()
 
     def _add_arguments(self, parser: ArgumentParser):
         for name, annotation in self.__dataclass_fields__.items():
@@ -225,45 +225,3 @@ def add_argument(
     # print('=' * 100)
 
     return PhantomAction(**kwargs)
-
-
-def default_parser_factory() -> ArgumentParser:
-    return ArgumentParser()
-
-
-def typed_args(_cls: TypedArgs = None, *, parser_factory: Callable[[], ArgumentParser] = default_parser_factory,
-               use_dataclass=True):
-    def wrap(cls):
-        return _process_class(cls, parser_factory=parser_factory, use_dataclass=use_dataclass)
-
-    if _cls is None:
-        return wrap
-
-    return wrap(_cls)
-
-
-def _process_class(cls, parser_factory: Callable[[], ArgumentParser] = default_parser_factory,
-                   use_dataclass=True):
-    if use_dataclass:
-        cls = dataclass(cls)
-
-    @classmethod
-    def from_args(cls: Callable, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
-        typed_args: TypedArgs = cls()
-        parser = parser_factory()
-        typed_args._parse_args(parser, args=args, namespace=namespace)
-        return typed_args
-
-    @classmethod
-    def from_known_args(cls: Callable, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
-        typed_args: TypedArgs = cls()
-        parser = parser_factory()
-        args = typed_args._parse_known_args(parser, args=args, namespace=namespace)
-        return typed_args, args
-
-    # print('cls:', cls.from_args)
-    cls.from_args = from_args
-    cls.from_known_args = from_known_args
-    # setattr(cls, 'from_know')
-
-    return cls

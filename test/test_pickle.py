@@ -1,8 +1,9 @@
-from typed_args import TypedArgs, add_argument, typed_args
+from typed_args import TypedArgs, add_argument, dataclass
 import pickle
 from typing import *
 
-@typed_args()
+
+@dataclass()
 class Args(TypedArgs):
     foo: Optional[str] = add_argument('--foo')
 
