@@ -9,7 +9,7 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.3.6'
+__version__ = '0.3.7'
 
 logger = logging.getLogger(__name__)
 
@@ -21,22 +21,22 @@ class TypedArgs:
     @classmethod
     def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args = cls()
-        typed_args.parse_args(args=args, namespace=namespace)
+        typed_args._parse_args(args=args, namespace=namespace)
         return typed_args
 
     @classmethod
     def from_known_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args = cls()
-        typed_args.parse_known_args(args=args, namespace=namespace)
-        return typed_args
+        args = typed_args._parse_known_args(args=args, namespace=namespace)
+        return typed_args, args
 
-    def add_arguments(self):
+    def _add_arguments(self):
         for name, annotation in self.__dataclass_fields__.items():
             if name == 'parser':
                 continue
-            self.add_argument(name, annotation.type)
+            self._add_argument(name, annotation.type)
 
-    def add_argument(self, name: str, annotation: Any):
+    def _add_argument(self, name: str, annotation: Any):
         values: Union[PhantomAction, Tuple[PhantomAction]] = getattr(self, name)
 
         if type(values) != tuple:
@@ -78,18 +78,19 @@ class TypedArgs:
 
             self.parser.add_argument(*args, **kwargs)
 
-    def parse_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
-        self.add_arguments()
+    def _parse_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
+        self._add_arguments()
         parsed_args = self.parser.parse_args(args=args, namespace=namespace)
-        self.update_arguments(parsed_args)
+        self._update_arguments(parsed_args)
 
-    def parse_known_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
-        self.add_arguments()
-        parsed_args, _ = self.parser.parse_known_args(
+    def _parse_known_args(self, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
+        self._add_arguments()
+        parsed_args, args = self.parser.parse_known_args(
             args=args, namespace=namespace)
-        self.update_arguments(parsed_args)
+        self._update_arguments(parsed_args)
+        return args
 
-    def update_arguments(self, parsed_args: Namespace):
+    def _update_arguments(self, parsed_args: Namespace):
         for name in self.__dataclass_fields__.keys():
             if name == 'parser':
                 continue
@@ -97,6 +98,9 @@ class TypedArgs:
             setattr(self, name, value)
 
         del self.parser
+
+        # self.parser = None
+
 
 @dataclass
 class PhantomAction:
