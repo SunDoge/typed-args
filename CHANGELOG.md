@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0]
 - Use `parser_factory()` to create `parser`.
+- Support optional parsing. If not using `add_argument` function, attributes will not be parsed.
 
 ## [0.3.7]
 - Fix `repr`.

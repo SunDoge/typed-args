@@ -1,6 +1,7 @@
 # TypedArgs
 
 [![Build Status](https://travis-ci.org/SunDoge/typed-args.svg?branch=master)](https://travis-ci.org/SunDoge/typed-args)
+[![Version](https://img.shields.io/pypi/v/typed-args)](https://pypi.org/project/typed-args/)
 
 Strong type args.
 
