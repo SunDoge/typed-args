@@ -14,11 +14,6 @@ From pypi
 pip install typed-args
 ```
 
-From github
-```bash
-pip install git+https://github.com/SunDoge/typed-args.git@v0.3
-```
-
 If you want to use it on python 3.5 and 3.6 please install `dataclasses`:
 
 ```bash
@@ -42,9 +37,6 @@ class Args(TypedArgs):
     num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
                                     help='number of data loading workers (default: 4)')
 
-    # def __post_init__(self):
-    #     self._parse_args(self.parser_factory())
-
     def parser_factory(self):
         return argparse.ArgumentParser('PROG')
 
@@ -56,9 +48,7 @@ def test_args():
 
     argv = f'{data} -a {arch} --workers {num_workers}'.split()
 
-    args = Args.from_args(argv)  # Recommanded
-
-    # _args = Args()  # if __post_init__ is defined
+    args = Args.from_args(argv)  
 
     assert args.arch == arch
     assert args.data == data
@@ -71,4 +61,4 @@ if __name__ == "__main__":
 
 ## Limitation
 
-Currently, we don't support add_group and sub parser.
+Currently, we don't support `add_group` and `sub parser`.

@@ -57,6 +57,10 @@ class TypedArgs:
                 types = (types[0],) * len(values)
 
         for argument_type, value in zip(types, values):
+            # 如果不适用add_argument，则不parse
+            if not isinstance(value, PhantomAction):
+                continue
+
             kwargs = value.to_kwargs()
             """
             If there's no option_strings, it must be a position argument.
@@ -108,10 +112,13 @@ class TypedArgs:
         return args
 
     def _update_arguments(self, parsed_args: Namespace):
-        for name in self.__dataclass_fields__.keys():
-            # if name == 'parser':
-            #     continue
-            value = getattr(parsed_args, name)
+        # for name in self.__dataclass_fields__.keys():
+        #     # if name == 'parser':
+        #     #     continue
+        #     value = getattr(parsed_args, name)
+        #     setattr(self, name, value)
+
+        for name, value in parsed_args.__dict__.items():
             setattr(self, name, value)
 
         # del self.parser

@@ -5,14 +5,12 @@ from dataclasses import dataclass
 from typed_args import TypedArgs, add_argument
 import argparse
 
+logging.basicConfig(level=logging.DEBUG)
 
-# logging.basicConfig(level=logging.DEBUG)
 
-
-# @typed_args(parser_factory=lambda: argparse.ArgumentParser("FUCK"))
-# @typed_args()
 @dataclass()
 class Args(TypedArgs):
+    foo: str = 'bar'
     data: str = add_argument(
         metavar='DIR',
         help='path to dataset'
@@ -30,11 +28,9 @@ class Args(TypedArgs):
         help='number of data loading workers (default: 4)'
     )
 
-    def __post_init__(self):
-        self._parse_args(self.parser_factory())
-
     def parser_factory(self):
         return argparse.ArgumentParser('PROG')
+
 
 @dataclass
 class Args1(Args):
@@ -50,10 +46,10 @@ def test_args():
 
     # sys.argv.extend(argv)
 
-    # args = Args.from_args(argv)
+    args = Args.from_args(argv)
     # args = Args.from_known_args()
     # args = Args1.from_args(argv)
-    args = Args()
+
     # args = Args.from_args()
     print(args)
 
@@ -66,4 +62,3 @@ if __name__ == "__main__":
     test_args()
     # from test.test_add_argument import *
     # test_name_or_flags()
-
