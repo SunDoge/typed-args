@@ -1,3 +1,4 @@
+import argparse
 from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
@@ -11,6 +12,12 @@ class Args(TypedArgs):
     num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
                                     help='number of data loading workers (default: 4)')
 
+    # def __post_init__(self):
+    #     self._parse_args(self.parser_factory())
+
+    def parser_factory(self):
+        return argparse.ArgumentParser('PROG')
+
 
 def test_args():
     data = '/path/to/dataset'
@@ -19,25 +26,9 @@ def test_args():
 
     argv = f'{data} -a {arch} --workers {num_workers}'.split()
 
-    # sys.argv.extend(argv)
+    args = Args.from_args(argv)  # Recommanded
 
-    args, _ = Args.from_known_args(argv)
-
-    assert args.arch == arch
-    assert args.data == data
-    assert args.num_workers == num_workers
-
-
-def test_known_args():
-    data = '/path/to/dataset'
-    arch = 'resnet50'
-    num_workers = 8
-
-    argv = f'{data} -a {arch} --workers {num_workers}'.split()
-
-    # sys.argv.extend(argv)
-
-    args = Args.from_args(argv)
+    # _args = Args()  # if __post_init__ is defined
 
     assert args.arch == arch
     assert args.data == data
@@ -45,5 +36,4 @@ def test_known_args():
 
 
 if __name__ == "__main__":
-    # test_args()
-    test_known_args()
+    test_args()

@@ -3,13 +3,14 @@ import sys
 from dataclasses import dataclass
 
 from typed_args import TypedArgs, add_argument
+import argparse
+
+logging.basicConfig(level=logging.DEBUG)
 
 
-# logging.basicConfig(level=logging.DEBUG)
-
-
-@dataclass
+@dataclass()
 class Args(TypedArgs):
+    foo: str = 'bar'
     data: str = add_argument(
         metavar='DIR',
         help='path to dataset'
@@ -27,8 +28,8 @@ class Args(TypedArgs):
         help='number of data loading workers (default: 4)'
     )
 
-    # def __post_init__(self):
-    #     self.parse_args()
+    def parser_factory(self):
+        return argparse.ArgumentParser('PROG')
 
 
 @dataclass
@@ -48,7 +49,7 @@ def test_args():
     args = Args.from_args(argv)
     # args = Args.from_known_args()
     # args = Args1.from_args(argv)
-    # args = Args()
+
     # args = Args.from_args()
     print(args)
 

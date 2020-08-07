@@ -1,5 +1,4 @@
-from typed_args import TypedArgs, add_argument
-from dataclasses import dataclass, field
+from typed_args import TypedArgs, add_argument, dataclass
 from typing import *
 import argparse
 
@@ -10,11 +9,9 @@ def test_name_or_flags():
 
     :return:
     """
-    import argparse
-    @dataclass
+
+    @dataclass()
     class Args(TypedArgs):
-        parser: argparse.ArgumentParser = field(
-            default_factory=lambda: argparse.ArgumentParser(prog='PROG'))
         foo: Optional[str] = add_argument('-f', '--foo')
         bar: str = add_argument()
 

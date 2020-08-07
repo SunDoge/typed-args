@@ -1,9 +1,9 @@
-from typed_args import TypedArgs, add_argument
-from dataclasses import dataclass
+from typed_args import TypedArgs, add_argument, dataclass
 import pickle
 from typing import *
 
-@dataclass
+
+@dataclass()
 class Args(TypedArgs):
     foo: Optional[str] = add_argument('--foo')
 
@@ -12,7 +12,7 @@ def test_pickle():
     args = Args.from_args([])
 
     try:
-        pickled_args = pickle.dumps(args)
+        _pickled_args = pickle.dumps(args)
     except Exception as e:
         raise e
 
