@@ -50,8 +50,6 @@ parser.add_argument(
 """
 TypedArgs
 """
-
-
 @dataclass
 class Args(TypedArgs):
     data: str = add_argument(metavar='DIR', help='path to dataset')
