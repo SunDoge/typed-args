@@ -8,7 +8,7 @@ import argparse
 logging.basicConfig(level=logging.DEBUG)
 
 
-@dataclass()
+@dataclass(repr=False)
 class Args(TypedArgs):
     foo: str = 'bar'
     data: str = add_argument(

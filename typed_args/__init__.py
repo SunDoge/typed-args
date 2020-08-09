@@ -2,6 +2,7 @@ import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
 from typing import Union, Optional, Any, Iterable, List, Tuple
+from pprint import pformat
 
 try:
     # Python 3.8
@@ -121,10 +122,10 @@ class TypedArgs:
         for name, value in parsed_args.__dict__.items():
             setattr(self, name, value)
 
-        # del self.parser
-
-        # self.parser = None
-
+        
+    def __repr__(self) -> str:
+        body =  pformat(self.__dict__)
+        return f'{self.__class__.__qualname__}{body}'
 
 def get_inner_types(annotation):
     """
