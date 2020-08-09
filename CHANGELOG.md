@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.4.1]
+## [0.4.1-alpha.1]
 - Add `__repr__`.
 - Add a comparison between `argparse` and `TypedArgs`.
 
