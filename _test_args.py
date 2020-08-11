@@ -42,10 +42,11 @@ def test_args():
     arch = 'resnet50'
     num_workers = 8
 
-    argv = f'{data} -a {arch} --workers {num_workers}'.split()
+    argv = f'{data} -a {arch} --jw {num_workers}'.split()
 
     # sys.argv.extend(argv)
 
+    print(argv)
     args = Args.from_args(argv)
     # args = Args.from_known_args()
     # args = Args1.from_args(argv)
