@@ -10,7 +10,7 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.4.1-alpha.1'
+__version__ = '0.4.1'
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +22,15 @@ class TypedArgs:
     @classmethod
     def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args = cls()
-        typed_args._parse_args(typed_args.parser_factory(), args=args, namespace=namespace)
+        typed_args._parse_args(typed_args.parser_factory(),
+                               args=args, namespace=namespace)
         return typed_args
 
     @classmethod
     def from_known_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
         typed_args = cls()
-        args = typed_args._parse_known_args(typed_args.parser_factory(), args=args, namespace=namespace)
+        args = typed_args._parse_known_args(
+            typed_args.parser_factory(), args=args, namespace=namespace)
         return typed_args, args
 
     def parser_factory(self):
@@ -42,7 +44,8 @@ class TypedArgs:
             self._add_argument(parser, name, annotation.type)
 
     def _add_argument(self, parser: ArgumentParser, name: str, annotation: Any):
-        values: Union[PhantomAction, Tuple[PhantomAction]] = getattr(self, name)
+        values: Union[PhantomAction,
+                      Tuple[PhantomAction]] = getattr(self, name)
 
         if type(values) != tuple:
             types = (annotation,)
@@ -87,7 +90,8 @@ class TypedArgs:
                 if kwargs.get('default') is None:
 
                     if origin is Union:  # Optional
-                        argument_type = get_args(argument_type)[0]  # Get first type
+                        argument_type = get_args(argument_type)[
+                            0]  # Get first type
                         kwargs['required'] = False
 
                     elif origin is None:
@@ -122,10 +126,10 @@ class TypedArgs:
         for name, value in parsed_args.__dict__.items():
             setattr(self, name, value)
 
-        
     def __repr__(self) -> str:
-        body =  pformat(self.__dict__)
+        body = pformat(self.__dict__)
         return f'{self.__class__.__qualname__}{body}'
+
 
 def get_inner_types(annotation):
     """
@@ -196,7 +200,7 @@ class PhantomAction:
             del kwargs['required']
 
         elif self.action == 'parsers':
-            raise NotImplemented()
+            raise NotImplementedError()
 
         return kwargs
 
