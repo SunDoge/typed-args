@@ -1,8 +1,8 @@
 import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
-from typing import Union, Optional, Any, Iterable, List, Tuple
 from pprint import pformat
+from typing import Any, Iterable, List, Optional, Tuple, TypeVar, Union
 
 try:
     # Python 3.8
@@ -10,9 +10,11 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 logger = logging.getLogger(__name__)
+
+T = TypeVar('T')
 
 
 @dataclass
@@ -20,14 +22,14 @@ class TypedArgs:
     # parser: ArgumentParser = field(default_factory=ArgumentParser)
 
     @classmethod
-    def from_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
+    def from_args(cls: T, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> T:
         typed_args = cls()
         typed_args._parse_args(typed_args.parser_factory(),
                                args=args, namespace=namespace)
         return typed_args
 
     @classmethod
-    def from_known_args(cls, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None):
+    def from_known_args(cls: T, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> Tuple[T, List[str]]:
         typed_args = cls()
         args = typed_args._parse_known_args(
             typed_args.parser_factory(), args=args, namespace=namespace)
@@ -109,7 +111,7 @@ class TypedArgs:
         self._update_arguments(parsed_args)
 
     def _parse_known_args(self, parser: ArgumentParser, args: Optional[List[str]] = None,
-                          namespace: Optional[Namespace] = None):
+                          namespace: Optional[Namespace] = None) -> List[str]:
         self._add_arguments(parser)
         parsed_args, args = parser.parse_known_args(
             args=args, namespace=namespace)
