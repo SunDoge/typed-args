@@ -10,7 +10,7 @@ try:
 except ImportError:
     from .utils import get_origin, get_args
 
-__version__ = '0.4.2'
+__version__ = '0.4.3'
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +23,14 @@ class TypedArgs:
 
     @classmethod
     def from_args(cls: T, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> T:
-        typed_args = cls()
+        typed_args: TypedArgs = cls()
         typed_args._parse_args(typed_args.parser_factory(),
                                args=args, namespace=namespace)
         return typed_args
 
     @classmethod
     def from_known_args(cls: T, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> Tuple[T, List[str]]:
-        typed_args = cls()
+        typed_args: TypedArgs = cls()
         args = typed_args._parse_known_args(
             typed_args.parser_factory(), args=args, namespace=namespace)
         return typed_args, args
@@ -51,7 +51,7 @@ class TypedArgs:
 
         if type(values) != tuple:
             types = (annotation,)
-            values = (values,)
+            values = (values,) 
         else:
             """
             List[Union[str, int]]
@@ -217,7 +217,7 @@ def add_argument(
         required: Optional[bool] = None,
         help: Optional[str] = None,
         metavar: Optional[str] = None,
-):
+) -> Any:
     """
 
     :param option_strings:
