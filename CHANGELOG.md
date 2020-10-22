@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.3]
 
-- Fix `default=None` bug.
-
 ## [0.4.2]
 
 - make `@classmethod` return correct type
@@ -49,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace attributes by name
 
 [unreleased]: https://github.com/SunDoge/typed-args
-[0.4.3]: https://github.com/SunDoge/typed-args/tree/v0.4.2
+[0.4.3]: https://github.com/SunDoge/typed-args/tree/v0.4.3
 [0.4.2]: https://github.com/SunDoge/typed-args/tree/v0.4.2
 [0.4.1]: https://github.com/SunDoge/typed-args/tree/v0.4.1
 [0.4.0]: https://github.com/SunDoge/typed-args/tree/v0.4.0

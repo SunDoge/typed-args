@@ -93,9 +93,9 @@ class TypedArgs:
             if kwargs['action'] == 'store':
 
                 # 不存在default的才需要判断optional
-                # if kwargs.get('default') is None:
+                if kwargs.get('default') is None:
                 # If default=None in kwargs, the above method return None, too.
-                if 'default' not in kwargs:
+                # if 'default' not in kwargs:
 
                     if origin is Union:  # Optional
                         argument_type = get_args(argument_type)[
