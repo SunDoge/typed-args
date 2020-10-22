@@ -1,20 +1,23 @@
 import logging
 from argparse import ArgumentParser, Namespace
-from dataclasses import dataclass
+from dataclasses import Field, dataclass
 from pprint import pformat
-from typing import Any, Iterable, List, Optional, Tuple, TypeVar, Union
+from typing import (Any, Dict, Iterable, List, Optional, Tuple, Type, TypeVar,
+                    Union)
 
 try:
     # Python 3.8
-    from typing import get_origin, get_args
+    from typing import get_args, get_origin
 except ImportError:
-    from .utils import get_origin, get_args
+    from .utils import get_args, get_origin
 
 __version__ = '0.4.3'
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 T = TypeVar('T')
+Fields = Dict[str, Field]
+_FILEDS = '__dataclass_fields__'
 
 
 @dataclass
@@ -22,24 +25,25 @@ class TypedArgs:
     # parser: ArgumentParser = field(default_factory=ArgumentParser)
 
     @classmethod
-    def from_args(cls: T, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> T:
-        typed_args: TypedArgs = cls()
+    def from_args(cls: Type[T], args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> T:
+        typed_args: TypedArgs = cls()  # type: ignore
         typed_args._parse_args(typed_args.parser_factory(),
                                args=args, namespace=namespace)
-        return typed_args
+        return typed_args  # type: ignore
 
     @classmethod
-    def from_known_args(cls: T, args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> Tuple[T, List[str]]:
-        typed_args: TypedArgs = cls()
+    def from_known_args(cls:  Type[T], args: Optional[List[str]] = None, namespace: Optional[Namespace] = None) -> Tuple[T, List[str]]:
+        typed_args: TypedArgs = cls()  # type: ignore
         args = typed_args._parse_known_args(
             typed_args.parser_factory(), args=args, namespace=namespace)
-        return typed_args, args
+        return typed_args, args  # type: ignore
 
     def parser_factory(self):
         return ArgumentParser()
 
     def _add_arguments(self, parser: ArgumentParser):
-        for name, annotation in self.__dataclass_fields__.items():
+        fields: Fields = getattr(self, _FILEDS)
+        for name, annotation in fields.items():
             # There's no parser on self
             # if name == 'parser':
             #     continue
@@ -51,7 +55,7 @@ class TypedArgs:
 
         if type(values) != tuple:
             types = (annotation,)
-            values = (values,) 
+            values = (values,)  # type: ignore
         else:
             """
             List[Union[str, int]]
@@ -60,9 +64,9 @@ class TypedArgs:
             types = get_inner_types(annotation)
             # List[int, ...]
             if types[-1] == Ellipsis:
-                types = (types[0],) * len(values)
+                types = (types[0],) * len(values)  # type: ignore
 
-        for argument_type, value in zip(types, values):
+        for argument_type, value in zip(types, values):  # type: ignore
             # 如果不适用add_argument，则不parse
             if not isinstance(value, PhantomAction):
                 continue
@@ -89,7 +93,9 @@ class TypedArgs:
             if kwargs['action'] == 'store':
 
                 # 不存在default的才需要判断optional
-                if kwargs.get('default') is None:
+                # if kwargs.get('default') is None:
+                # If default=None in kwargs, the above method return None, too.
+                if 'default' not in kwargs:
 
                     if origin is Union:  # Optional
                         argument_type = get_args(argument_type)[
@@ -232,7 +238,7 @@ def add_argument(
     :return:
     """
     kwargs = locals()
-    logger.debug('local = ', kwargs)
+    _logger.debug('local = ', kwargs)
 
     # print('=' * 100)
     # print(kwargs)
