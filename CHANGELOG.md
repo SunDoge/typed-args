@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.5.0]
+
 - Function `add_argument` accepts `type` now and we don't check the type annotations in dataclass fields. This make `typed-args` less strict but more easy to use.
+- Python 3.6 is supported now. Python 3.5 should work but I didn't test it.
 
 ## [0.4.2]
 
