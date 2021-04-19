@@ -2,39 +2,36 @@ import logging
 import sys
 from dataclasses import dataclass
 
-from typed_args import TypedArgs, add_argument
+# from typed_args import TypedArgs, add_argument
+import typed_args as tp
 import argparse
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-@dataclass(repr=False)
-class Args(TypedArgs):
+@dataclass()
+class Args(tp.TypedArgs):
     foo: str = 'bar'
-    data: str = add_argument(
+    data: str = tp.add_argument(
         metavar='DIR',
         help='path to dataset'
     )
-    arch: str = add_argument(
+    arch: str = tp.add_argument(
         '-a', '--arch',
         metavar='ARCH',
         default='resnet18',
         help='model architecture (default: resnet18)'
     )
-    num_workers: int = add_argument(
+    num_workers: int = tp.add_argument(
         '-j', '--workers',
         default=4,
         metavar='N',
         help='number of data loading workers (default: 4)'
     )
 
-    def parser_factory(self):
-        return argparse.ArgumentParser('PROG')
-
-
 @dataclass
 class Args1(Args):
-    foo: str = add_argument('--foo')
+    foo: str = tp.add_argument('--foo')
 
 
 def test_args():
@@ -42,7 +39,7 @@ def test_args():
     arch = 'resnet50'
     num_workers = 8
 
-    argv = f'{data} -a {arch} --jw {num_workers}'.split()
+    argv = f'{data} -a {arch} -j {num_workers}'.split()
 
     # sys.argv.extend(argv)
 
