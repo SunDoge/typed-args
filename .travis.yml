@@ -2,9 +2,11 @@ dist: xenial
 language: python
 # I only use these versions.
 python:
+  - "3.6"
   - "3.7"
   - "3.8"
 script:
+  - pip install dataclasses
   - pytest
 # Don't notify me on success.
 notifications:

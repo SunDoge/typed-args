@@ -1,12 +1,12 @@
 import argparse
 from dataclasses import dataclass
 
-from typed_args import TypedArgs, add_argument
+import typed_args as ta
 
 """
 argparse
 """
-parser = argparse.ArgumentParser(prog='PROG')
+parser = argparse.ArgumentParser()
 parser.add_argument(
     'data', metavar='DIR', type=str,
     help='path to dataset'
@@ -26,15 +26,18 @@ TypedArgs
 
 
 @dataclass
-class Args(TypedArgs):
-    data: str = add_argument(metavar='DIR', help='path to dataset')
-    arch: str = add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
-                             help='model architecture (default: resnet18)')
-    num_workers: int = add_argument('-j', '--workers', default=4, metavar='N',
-                                    help='number of data loading workers (default: 4)')
-
-    def parser_factory(self):
-        return argparse.ArgumentParser('PROG')
+class Args(ta.TypedArgs):
+    data: str = ta.add_argument(
+        metavar='DIR', type=str, help='path to dataset'
+    )
+    arch: str = ta.add_argument(
+        '-a', '--arch', metavar='ARCH', default='resnet18', type=str,
+        help='model architecture (default: resnet18)'
+    )
+    num_workers: int = ta.add_argument(
+        '-j', '--workers', default=4, metavar='N', type=int,
+        help='number of data loading workers (default: 4)'
+    )
 
 
 def test_args():
