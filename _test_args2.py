@@ -29,6 +29,7 @@ class Args1(tp.TypedArgs):
 # rich.print(A.__dataclass_fields__)
 
 
+
 args1 = Args1.from_args()
 print(args1.foo)
 

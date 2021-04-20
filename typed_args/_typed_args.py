@@ -11,6 +11,7 @@ import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import Field, dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
+from enum import Enum
 
 _logger = logging.getLogger(__name__)
 
@@ -152,3 +153,28 @@ def _add_argument(*args, **kwargs) -> Field:
     metadata = {'type': 'add_argument', 'args': args, 'kwargs': kwargs}
     _logger.debug('metadata: %s', metadata)
     return field(default=None, metadata=metadata)
+
+
+def add_parser():
+    pass
+
+
+def _add_parser(**kwargs):
+    pass
+
+
+def _get_members(cls) -> Dict[str, Enum]:
+    return getattr(cls, '__members__')
+
+
+class SubTypedArgs(TypedArgs, Enum):
+
+    @classmethod
+    def _add_arguments(cls, parser: ArgumentParser, prefix: str):
+        subparsers = parser.add_subparsers()
+        members = _get_members(cls)
+
+        for name, member in members.items():
+            name = prefix + name
+            subparser = subparsers.add_parser(name)
+            member.value._add_arguments(subparser)
