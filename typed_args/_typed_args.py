@@ -10,8 +10,8 @@ import inspect
 import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import Field, dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 from enum import Enum
+from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
 
 _logger = logging.getLogger(__name__)
 
@@ -151,8 +151,9 @@ def _add_argument(*args, **kwargs) -> Field:
         action: str
     """
     metadata = {'type': 'add_argument', 'args': args, 'kwargs': kwargs}
+    default = kwargs.get('default', None)
     _logger.debug('metadata: %s', metadata)
-    return field(default=None, metadata=metadata)
+    return field(default=default, metadata=metadata)
 
 
 def add_parser():
