@@ -9,4 +9,4 @@ if sys.version_info.major == 3 and sys.version_info.minor <= 6:
 
 from ._typed_args import TypedArgs, add_argument
 
-__version__ = "0.5.0.a1"
+__version__ = "0.5.0.a2"
