@@ -48,9 +48,9 @@ class TypedArgs:
     @classmethod
     def from_known_args(
         cls,
-        parser: Optional[ArgumentParser] = None,
         args: Optional[List[str]] = None,
-        namespace: Optional[Namespace] = None
+        namespace: Optional[Namespace] = None,
+        parser: Optional[ArgumentParser] = None,
     ) -> Tuple[T, List[str]]:
         if parser is None:
             parser = ArgumentParser()

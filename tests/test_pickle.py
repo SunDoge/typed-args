@@ -11,7 +11,7 @@ class Args(tp.TypedArgs):
 
 
 def test_pickle():
-    args = Args.from_args([])
+    args, _ = Args.from_known_args([])
     _pickled_args = pickle.dumps(args)
     assert _pickled_args
 
