@@ -11,11 +11,11 @@ import logging
 from argparse import ArgumentParser, Namespace
 from dataclasses import Field, dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Dict, List, Optional, Sequence, Tuple, Type, TypeVar
 
 _logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar('T', bound='TypedArgs')
 
 
 def _get_dataclass_fields(cls) -> Dict[str, Field]:
@@ -27,11 +27,11 @@ class TypedArgs:
 
     @classmethod
     def from_args(
-        cls,
+        cls: Type[T],
         args: Optional[List[str]] = None,
         namespace: Optional[Namespace] = None,
         parser: Optional[ArgumentParser] = None,
-    ):
+    ) -> T:
 
         if parser is None:
             parser = ArgumentParser()
@@ -47,7 +47,7 @@ class TypedArgs:
 
     @classmethod
     def from_known_args(
-        cls,
+        cls: Type[T],
         args: Optional[List[str]] = None,
         namespace: Optional[Namespace] = None,
         parser: Optional[ArgumentParser] = None,
@@ -66,10 +66,9 @@ class TypedArgs:
 
     @classmethod
     def _add_arguments(
-        cls: T,
+        cls,
         parser: ArgumentParser,
         prefix: str = '',
-
     ):
         fields = _get_dataclass_fields(cls)
         for name, field in fields.items():
