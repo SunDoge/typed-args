@@ -27,7 +27,15 @@ def test_default_list():
     class Args(ta.TypedArgs):
         foo: int = ta.add_argument('--foo', type=int, default=42)
         bar: List[int] = ta.add_argument(nargs='*', default=[1, 2, 3])
+        config: List[str] = ta.add_argument(
+            '--config', default=[], type=str, action='append')
 
     args = Args.from_args([])
 
     assert args.bar == [1, 2, 3]
+    assert args.config == []
+
+    args1 = Args()
+    assert args1.foo == 42
+    assert args1.bar == [1, 2, 3]
+    assert args1.config == []

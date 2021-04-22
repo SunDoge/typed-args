@@ -165,14 +165,14 @@ def _add_argument(*args, **kwargs) -> Field:
             'mutable object cannot be dataclass default attribute, make default_factory'
         )
 
+        field_default = dataclasses.MISSING
         def default_factory(): return default
-
-        default = dataclasses.MISSING
     else:
+        field_default = default
         default_factory = dataclasses.MISSING
 
     # _logger.debug('metadata: %s', metadata)
-    return field(default=default, default_factory=default_factory, metadata=metadata)
+    return field(default=field_default, default_factory=default_factory, metadata=metadata)
 
 
 def add_parser():

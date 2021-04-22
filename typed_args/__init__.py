@@ -9,4 +9,4 @@ except ImportError as e:
 
 from ._typed_args import TypedArgs, add_argument
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
