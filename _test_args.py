@@ -3,26 +3,26 @@ import sys
 from dataclasses import dataclass
 
 # from typed_args import TypedArgs, add_argument
-import typed_args as tp
+import typed_args as ta
 import argparse
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 @dataclass()
-class Args(tp.TypedArgs):
+class Args(ta.TypedArgs):
     foo: str = 'bar'
-    data: str = tp.add_argument(
+    data: str = ta.add_argument(
         metavar='DIR',
         help='path to dataset'
     )
-    arch: str = tp.add_argument(
+    arch: str = ta.add_argument(
         '-a', '--arch',
         metavar='ARCH',
         default='resnet18',
         help='model architecture (default: resnet18)'
     )
-    num_workers: int = tp.add_argument(
+    num_workers: int = ta.add_argument(
         '-j', '--workers',
         default=4,
         metavar='N',
@@ -31,7 +31,7 @@ class Args(tp.TypedArgs):
 
 @dataclass
 class Args1(Args):
-    foo: str = tp.add_argument('--foo')
+    foo: str = ta.add_argument('--foo')
 
 
 def test_args():

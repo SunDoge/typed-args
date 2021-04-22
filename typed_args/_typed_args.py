@@ -6,6 +6,7 @@ metadata = {
 }
 """
 
+import dataclasses
 import inspect
 import logging
 from argparse import ArgumentParser, Namespace
@@ -151,8 +152,20 @@ def _add_argument(*args, **kwargs) -> Field:
     """
     metadata = {'type': 'add_argument', 'args': args, 'kwargs': kwargs}
     default = kwargs.get('default', None)
+
+    if isinstance(default, (list, dict, set)):
+        _logger.debug(
+            'mutable object cannot be dataclass default attribute, make default_factory'
+        )
+
+        def default_factory(): return default
+
+        default = dataclasses.MISSING
+    else:
+        default_factory = dataclasses.MISSING
+
     _logger.debug('metadata: %s', metadata)
-    return field(default=default, metadata=metadata)
+    return field(default=default, default_factory=default_factory, metadata=metadata)
 
 
 def add_parser():

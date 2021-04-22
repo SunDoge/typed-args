@@ -1,13 +1,14 @@
 # from typed_args import TypedArgs, add_argument, dataclass
-import typed_args as tp
+import typed_args as ta
 import pickle
-from typing import Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 
 @dataclass()
-class Args(tp.TypedArgs):
-    foo: Optional[str] = tp.add_argument('--foo')
+class Args(ta.TypedArgs):
+    foo: Optional[str] = ta.add_argument('--foo')
+    bar: List[int] = ta.add_argument(nargs='*', default=[1, 2, 3])
 
 
 def test_pickle():

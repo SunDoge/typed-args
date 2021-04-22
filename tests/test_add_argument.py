@@ -1,13 +1,13 @@
-import typed_args as tp
+import typed_args as ta
 import pytest
 from dataclasses import dataclass
 
 
 def test_name_or_flags():
     @dataclass
-    class Args(tp.TypedArgs):
-        foo: str = tp.add_argument('-f', '--foo')
-        bar: str = tp.add_argument()
+    class Args(ta.TypedArgs):
+        foo: str = ta.add_argument('-f', '--foo')
+        bar: str = ta.add_argument()
 
     args1 = Args.from_args(['BAR'])
     assert args1 == Args(bar='BAR')
@@ -23,8 +23,8 @@ def test_name_or_flags():
 
 def test_store_action():
     @dataclass
-    class Args(tp.TypedArgs):
-        foo: str = tp.add_argument('--foo')
+    class Args(ta.TypedArgs):
+        foo: str = ta.add_argument('--foo')
 
     args = Args.from_args('--foo 1'.split())
     assert args == Args(foo='1')
@@ -32,8 +32,11 @@ def test_store_action():
 
 def test_store_const_action():
     @dataclass
-    class Args(tp.TypedArgs):
-        foo: int = tp.add_argument('--foo', action='store_const', const=42)
+    class Args(ta.TypedArgs):
+        foo: int = ta.add_argument('--foo', action='store_const', const=42)
 
     args = Args.from_args(['--foo'])
     assert args == Args(foo=42)
+
+
+
