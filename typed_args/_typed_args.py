@@ -76,15 +76,15 @@ class TypedArgs:
 
             # 嵌套
             dest = prefix + name
-            _logger.debug('enter dest: %s', dest)
+            # _logger.debug('enter dest: %s', dest)
 
             if inspect.isclass(field.type) and issubclass(field.type, TypedArgs):
                 # 如果是嵌套的，就加上prefix之后解析
-                _logger.debug('add recursive parser: %s', dest)
+                # _logger.debug('add recursive parser: %s', dest)
                 field.type._add_arguments(parser, prefix=dest + '.')
             else:
                 func_type = field.metadata.get('type', 'none')
-                _logger.debug('get metadata=%s', field.metadata)
+                # _logger.debug('get metadata=%s', field.metadata)
                 if func_type == 'add_argument':
                     args: Sequence[str] = field.metadata['args']
                     kwargs = field.metadata['kwargs']
@@ -97,7 +97,7 @@ class TypedArgs:
                                 new_args.append('-' + prefix + a[1:])
                         args = new_args
 
-                    _logger.debug('add normal argument: %s', dest)
+                    # _logger.debug('add normal argument: %s', dest)
                     parser.add_argument(*args, dest=dest, **kwargs)
                 elif func_type == 'none':
                     continue
@@ -164,7 +164,7 @@ def _add_argument(*args, **kwargs) -> Field:
     else:
         default_factory = dataclasses.MISSING
 
-    _logger.debug('metadata: %s', metadata)
+    # _logger.debug('metadata: %s', metadata)
     return field(default=default, default_factory=default_factory, metadata=metadata)
 
 
