@@ -9,10 +9,12 @@ metadata = {
 import dataclasses
 import inspect
 import logging
-from argparse import ArgumentParser, Namespace
+from argparse import Action, ArgumentParser, Namespace
+from collections.abc import Container
 from dataclasses import Field, dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Sequence, Tuple, Type, TypeVar
+from typing import (Any, Callable, Dict, List, Optional, Sequence, Tuple, Type,
+                    TypeVar, Union)
 
 _logger = logging.getLogger(__name__)
 
@@ -129,18 +131,23 @@ class TypedArgs:
 
 def add_argument(
     *flags: str,
-    action=None,
-    nargs=None,
-    const=None,
-    default=None,
-    type=None,
-    choices=None,
-    required=None,
-    help=None,
-    metavar=None,
+    action: Union[str, Type[Action]] = None,
+    nargs: Union[str, int] = None,
+    const: Any = None,
+    default: Any = None,
+    type: Callable[[str], Any] = None,
+    choices: Container = None,  # to support `is in`
+    required: bool = None,
+    help: str = None,
+    metavar: str = None,
 ) -> Field:
     kwargs = locals()
     args = kwargs.pop('flags')
+
+    # The parser.add_argument only accept args with value
+    # We use default value None to filter out the unused args
+    # add_argument(*args, **kwargs) 有复杂的规则
+    # 为了避免手动处理这些规则，采用过滤 None 的方式来过滤没有使用的参数
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
     return _add_argument(*args, **kwargs)
 
