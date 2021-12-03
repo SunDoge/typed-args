@@ -1,6 +1,8 @@
-import typed_args as ta
-import pytest
 from dataclasses import dataclass
+
+import pytest
+
+import typed_args as ta
 
 
 def test_name_or_flags():
@@ -37,6 +39,3 @@ def test_store_const_action():
 
     args = Args.from_args(['--foo'])
     assert args == Args(foo=42)
-
-
-

@@ -1,9 +1,9 @@
+import logging
+import pickle
 from dataclasses import dataclass
 from typing import Optional
+
 import typed_args._typed_args as tp
-import rich
-import pickle
-import logging
 
 _logger = logging.getLogger(__name__)
 
@@ -27,7 +27,6 @@ class Args1(tp.TypedArgs):
 
 # rich.print(A.__annotations__)
 # rich.print(A.__dataclass_fields__)
-
 
 
 args1 = Args1.from_args()
