@@ -11,7 +11,7 @@ import inspect
 import logging
 from argparse import Action, ArgumentParser, Namespace
 from collections.abc import Container
-from dataclasses import Field, dataclass, field
+from dataclasses import Field, dataclass
 from enum import Enum
 from typing import (Any, Callable, Dict, List, Optional, Sequence, Tuple, Type,
                     TypeVar, Union)
@@ -41,10 +41,11 @@ class TypedArgs:
 
         cls._add_arguments(parser, prefix='')
 
-        args = parser.parse_args(args=args, namespace=namespace)
+        parsed_args: Namespace = parser.parse_args(
+            args=args, namespace=namespace)
 
         typed_args = cls()
-        typed_args._assign(args, prefix='')
+        typed_args._assign(parsed_args, prefix='')
 
         return typed_args
 
@@ -60,10 +61,11 @@ class TypedArgs:
 
         cls._add_arguments(parser, prefix='')
 
-        args, unknown = parser.parse_known_args(args=args, namespace=namespace)
+        parsed_args, unknown = parser.parse_known_args(
+            args=args, namespace=namespace)
 
         typed_args = cls()
-        typed_args._assign(args, prefix='')
+        typed_args._assign(parsed_args, prefix='')
 
         return typed_args, unknown
 
@@ -140,7 +142,7 @@ def add_argument(
     required: bool = None,
     help: str = None,
     metavar: str = None,
-) -> Field:
+) -> Union[Field, Any]:
     kwargs = locals()
     args = kwargs.pop('flags')
 
@@ -172,7 +174,11 @@ def _add_argument(*args, **kwargs) -> Field:
         default_factory = dataclasses.MISSING
 
     # _logger.debug('metadata: %s', metadata)
-    return field(default=field_default, default_factory=default_factory, metadata=metadata)
+    return dataclasses.field(
+        default=field_default,
+        default_factory=default_factory,
+        metadata=metadata
+    )
 
 
 def add_parser():
