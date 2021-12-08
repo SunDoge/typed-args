@@ -142,7 +142,7 @@ def add_argument(
     required: bool = None,
     help: str = None,
     metavar: str = None,
-) -> Union[Field, Any]:
+) -> Any:
     kwargs = locals()
     args = kwargs.pop('flags')
 

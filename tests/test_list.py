@@ -1,8 +1,8 @@
-from typed_args import TypedArgs, add_argument
 from dataclasses import dataclass
 from typing import List
+
 import typed_args as ta
-import pickle
+from typed_args import TypedArgs, add_argument
 
 
 def test_list():
