@@ -7,9 +7,12 @@ except ImportError as e:
     )
     raise e
 
-from ._typed_args import TypedArgs, add_argument
+# from ._typed_args import TypedArgs, add_argument
+from .core import add_argument
 
-__version__ = "0.5.2"
+
+
+__version__ = "0.6.0"
 
 __all__ = [
     'TypedArgs', 'add_argument'

@@ -193,6 +193,10 @@ def add_parser(typed_args: Type, **kwargs):
     return metadata
 
 
+def add_argument_group(name: str):
+    pass
+
+
 T = TypeVar("T")
 
 
