@@ -10,41 +10,41 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 @dataclass()
-class Args(ta.TypedArgs):
-    foo: str = 'bar'
-    data: str = ta.add_argument(
-        metavar='DIR',
-        help='path to dataset'
-    )
+class Args:
+    foo: str = "bar"
+    data: str = ta.add_argument(metavar="DIR", help="path to dataset")
     arch: str = ta.add_argument(
-        '-a', '--arch',
-        metavar='ARCH',
-        default='resnet18',
-        help='model architecture (default: resnet18)'
+        "-a",
+        "--arch",
+        metavar="ARCH",
+        default="resnet18",
+        help="model architecture (default: resnet18)",
     )
     num_workers: int = ta.add_argument(
-        '-j', '--workers',
+        "-j",
+        "--workers",
         default=4,
-        metavar='N',
-        help='number of data loading workers (default: 4)'
+        metavar="N",
+        help="number of data loading workers (default: 4)",
     )
+
 
 @dataclass
 class Args1(Args):
-    foo: str = ta.add_argument('--foo')
+    foo: str = ta.add_argument("--foo")
 
 
 def test_args():
-    data = '/path/to/dataset'
-    arch = 'resnet50'
+    data = "/path/to/dataset"
+    arch = "resnet50"
     num_workers = 8
 
-    argv = f'{data} -a {arch} -j {num_workers}'.split()
-
-    # sys.argv.extend(argv)
+    argv = f"{data} -a {arch} -j {num_workers}".split()
 
     print(argv)
-    args = Args.from_args(argv)
+    from typed_args.core import parse_args
+
+    args = parse_args(Args, args=argv)
     # args = Args.from_known_args()
     # args = Args1.from_args(argv)
 
