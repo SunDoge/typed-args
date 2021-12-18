@@ -63,11 +63,14 @@ def add_argument(*args, **kwargs):
 
 
 def add_argument_group(description: Optional[str] = None):
-    action = Action(ActionType.AddArgumentGroup, (), dict(description=description))
+    action = Action(ActionType.AddArgumentGroup, (),
+                    dict(description=description))
     return dataclasses.field(metadata=dict(action=action))
+
 
 def add_parser():
     pass
+
 
 def add_subparsers():
     pass
