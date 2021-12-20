@@ -7,3 +7,4 @@ dist/
 .idea/
 *.pyc
 .mypy_cache/
+poetry.lock
