@@ -32,6 +32,7 @@ def get_action_from_field(field: dataclasses.Field) -> Action:
     # _logger.debug('field: %s', field)
     return field.metadata["action"]
 
+
 def has_action(field: dataclasses.Field) -> bool:
     return 'action' in field.metadata
 
