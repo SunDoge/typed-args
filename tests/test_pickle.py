@@ -26,7 +26,7 @@ class Args:
 
 
 def test_pickle():
-    args, _ = ta.parse_known_args()
+    args, _ = ta.parse_known_args(Args)
     _pickled_args = pickle.dumps(args)
     assert _pickled_args
 
