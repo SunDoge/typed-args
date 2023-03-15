@@ -23,7 +23,9 @@ def _parse_dataclass(parser: argparse.ArgumentParser, x, prefix: str = ''):
             group = parser.add_argument_group(title=name)
             _parse_dataclass(group, field.type, prefix=dest + '.')
         elif action == 'add_subparsers':
-            subparsers = parser.add_subparsers()
+            args = field.metadata.get('args')
+            kwargs = field.metadata.get('kwargs')
+            subparsers = parser.add_subparsers(*args, **kwargs)
             _parse_enum(subparsers, field.type, prefix=dest + '.')
 
 
@@ -33,8 +35,9 @@ def _parse_enum(subparsers: argparse._SubParsersAction, x, prefix: str = ''):
 
     for member in members.values():
         name = member.value.get('name')
+        kwargs = member.value.get('kwargs')
         dest = prefix + member.name
-        parser = subparsers.add_parser(name)
+        parser = subparsers.add_parser(name, **kwargs)
         _parse_dataclass(parser, annotations.get(
             member.name), prefix=dest + '.')
 
@@ -59,8 +62,8 @@ def add_subparsers(*args, **kwargs):
     return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_subparsers'))
 
 
-def add_parser(name: str):
-    return dict(name=name)
+def add_parser(name: str, **kwargs):
+    return dict(name=name, kwargs=kwargs)
 
 
 class DefaultHelpFormatter(argparse.HelpFormatter):

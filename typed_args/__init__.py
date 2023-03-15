@@ -7,12 +7,14 @@ except ImportError as e:
     )
     raise e
 
-# from ._typed_args import TypedArgs, add_argument
+from ._core import parse_args, parse_known_args, argument_parser
+from ._parser import add_argument, add_argument_group, add_parser, add_subparsers
+from ._utils import SubcommandEnum
 
-__version__ = "0.5.2"
+__version__ = "0.6.0"
 
 __all__ = [
-    'TypedArgs', 'add_argument'
+    'parse_args', 'parse_known_args', 'argument_parser',
+    'add_argument', 'add_argument_group', 'add_parser', 'add_subparsers',
+    'SubcommandEnum',
 ]
-
-
