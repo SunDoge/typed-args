@@ -1,12 +1,10 @@
 import argparse
 from typing import Type, TypeVar, Dict, List, Any, Optional
 import dataclasses
-import inspect
 from icecream import ic
-import enum
-from types import DynamicClassAttribute
 from ._utils import get_annotations, get_dataclass_fields, get_members
 import logging
+import enum
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +39,14 @@ def _parse_enum(subparsers: argparse._SubParsersAction, x, prefix: str = ''):
             member.name), prefix=dest + '.')
 
 
+def parse(parser: argparse.ArgumentParser, x):
+    if issubclass(x, enum.Enum):
+        subparsers = parser.add_subparsers()
+        _parse_enum(subparsers, x)
+    else:
+        _parse_dataclass(parser, x)
+
+
 def add_argument(*args, **kwargs):
     return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_argument'))
 
@@ -64,6 +70,3 @@ class DefaultHelpFormatter(argparse.HelpFormatter):
 
     def _get_default_metavar_for_positional(self, action: argparse.Action) -> str:
         return action.dest.split('.')[-1]
-
-
-

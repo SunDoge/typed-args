@@ -1,10 +1,11 @@
 import dataclasses
 import argparse
-from typed_args._parser import add_argument, add_argument_group, add_parser, add_subparsers, _parse_dataclass
-from typed_args._assigner import _assign_dataclass
+from typed_args._parser import add_argument, add_argument_group, add_parser, add_subparsers
 from typed_args._utils import SubcommandEnum
 from icecream import ic
 import logging
+from typed_args._core import argument_parser
+import functools
 
 
 @dataclasses.dataclass
@@ -37,9 +38,10 @@ class SubCommands(SubcommandEnum):
     CMD2: Cmd2 = add_parser('cmd2')
 
 
+@argument_parser(prog='dddd')
 @dataclasses.dataclass
 class Args:
-    x1: str = add_argument('--x1')
+    x1: str = add_argument()
     group1: Group1 = add_argument_group()
     group2: Group2 = add_argument_group()
     sub_cmd: SubCommands = add_subparsers()
@@ -48,20 +50,8 @@ class Args:
 def test():
     logging.basicConfig(level=logging.DEBUG)
 
-    parser = argparse.ArgumentParser()
-    _parse_dataclass(parser, Args)
-    # ic(parser.print_help())
+    args = Args.parse_args()
 
-    ns = parser.parse_args()
-    ic(ns)
-    ic(Args())
-    args = Args()
-    ic(SubCommands.CMD1(10000) == SubCommands.CMD1)
-    ic(SubCommands.CMD1)
-    ic(id(SubCommands.CMD1))
-    ic(SubCommands.CMD1 == SubCommands.CMD1(10000))
-
-    _assign_dataclass(args, ns)
     ic(args)
 
 
