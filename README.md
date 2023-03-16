@@ -1,9 +1,9 @@
 # TypedArgs
 
-[![Build Status](https://travis-ci.org/SunDoge/typed-args.svg?branch=master)](https://travis-ci.org/SunDoge/typed-args)
-[![Version](https://img.shields.io/pypi/v/typed-args)](https://pypi.org/project/typed-args/)
+[![Github Actions](https://img.shields.io/github/actions/workflow/status/SunDoge/typed-args/python-package.yml?branch=master&style=for-the-badge)](https://github.com/SunDoge/typed-args/actions/workflows/python-package.yml)
+[![Pypi](https://img.shields.io/pypi/v/typed-args?style=for-the-badge)](https://pypi.org/project/typed-args/)
 
-Strong type args.
+Strong typed command line argument parser for Python.
 
 This project is inspired by [TeXitoi/structopt](https://github.com/TeXitoi/structopt).
 
