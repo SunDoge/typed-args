@@ -8,3 +8,4 @@ dist/
 *.pyc
 .mypy_cache/
 poetry.lock
+site/

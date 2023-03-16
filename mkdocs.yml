@@ -1,0 +1,6 @@
+site_name: typed-args
+
+
+nav:
+  - Introduction: index.md
+  - Quickstart: quickstart.md  
