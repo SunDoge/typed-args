@@ -21,67 +21,70 @@ If you want to use it on python 3.5 and 3.6 please install `dataclasses`:
 pip install dataclasses
 ```
 
-## Usage
+## Core Functionality
 
+Check [_test_v0_6.py](https://github.com/SunDoge/typed-args/blob/master/_test_v0_6.py) for `add_argument_group` and `add_subparsers`.
+
+
+### Create a parser
+
+`argparse`
 
 ```python
 import argparse
+parser = argparse.ArgumentParser(prog='ProgramName')
+```
 
+`typed-args`
+
+```python
 import typed_args as ta
 
-"""
-argparse
-"""
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    'data', metavar='DIR', type=str,
-    help='path to dataset'
-)
-parser.add_argument(
-    '-a', '--arch', metavar='ARCH', default='resnet18', type=str,
-    help='model architecture (default: resnet18)'
-)
-parser.add_argument(
-    '-j', '--workers', default=4, metavar='N', type=int, dest='num_workers',
-    help='number of data loading workers (default: 4)'
-)
+@ta.argument_parser(prog='ProgramName')
+class Args:
+    pass
+```
 
-"""
-TypedArgs
-"""
+### Add arguments
+
+`argparse`
+
+```python
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('filename')           # positional argument
+parser.add_argument('-c', '--count')      # option that takes a value
+parser.add_argument('-v', '--verbose',
+                    action='store_true')  # on/off flag
+```
+
+`typed-args`
+
+```python
+import typed_args as ta
+
 @ta.argument_parser()
 class Args:
-    data: str = ta.add_argument(
-        metavar='DIR', type=str, help='path to dataset'
-    )
-    arch: str = ta.add_argument(
-        '-a', '--arch', metavar='ARCH', default='resnet18', type=str,
-        help='model architecture (default: resnet18)'
-    )
-    num_workers: int = ta.add_argument(
-        '-j', '--workers', default=4, metavar='N', type=int,
-        help='number of data loading workers (default: 4)'
-    )
-
-
-def test_args():
-    data = '/path/to/dataset'
-    arch = 'resnet50'
-    num_workers = 8
-
-    argv = f'{data} -a {arch} --workers {num_workers}'.split()
-
-    """
-    from_args = parse_args, from_known_args = parse_known_args
-    """
-    typed_args = Args.parse_args(argv)
-    args = parser.parse_args(argv)
-
-    assert args.arch == typed_args.arch
-    assert args.data == typed_args.data
-    assert args.num_workers == typed_args.num_workers
-
-
-if __name__ == "__main__":
-    test_args()
+    filename: str = ta.add_argument()                    # positional argument, use the attribute name automatically
+    count: str = ta.add_argument('-c', '--count')        # option that takes a value, also can be annotated as Optional[str]
+    verbose: bool = ta.add_argument('-v', '--verbose', 
+                                    action='store_true') # on/off flag
 ```
+
+### Parse args
+
+`argparse`
+
+```python
+args = parser.parse_args()
+print(args.filename, args.count, args.verbose)
+```
+
+`typed-args`
+
+```python
+args = Args.parse_args()
+print(args.filename, args.count, args.verbose)
+```
+
+
