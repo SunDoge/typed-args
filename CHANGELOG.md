@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2]
+
+- Don't remmber what I changed.
+
 ## [0.5.1]
 
 - Fix default argument. `add_argument(default=[])` now init the correct `[]` for dataclass.
@@ -54,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace attributes by name
 
 [unreleased]: https://github.com/SunDoge/typed-args
+[0.5.2]: https://github.com/SunDoge/typed-args/tree/v0.5.2
 [0.5.1]: https://github.com/SunDoge/typed-args/tree/v0.5.1
 [0.5.0]: https://github.com/SunDoge/typed-args/tree/v0.5.0
 [0.4.2]: https://github.com/SunDoge/typed-args/tree/v0.4.2
