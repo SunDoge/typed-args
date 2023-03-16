@@ -1,7 +1,13 @@
+import argparse
+from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar
+import dataclasses
+import logging
+
 from ._assigner import assign
 from ._parser import parse
-import argparse
-from typing import Optional, Sequence, Type, TypeVar, Tuple, List, Generic, Union, Callable
+
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar('T')
 
@@ -38,10 +44,6 @@ def parse_known_args(
 
 class _Parsable(Generic[T]):
 
-    @staticmethod
-    def make_parser() -> argparse.ArgumentParser:
-        pass
-
     @classmethod
     def parse_args(cls, args: Optional[Sequence[str]] = None, namespace:  Optional[argparse.Namespace] = None) -> T:
         pass
@@ -65,9 +67,12 @@ def argument_parser(**kwargs):
             parser = _make_parser()
             return parse_known_args(klass, parser=parser, args=args, namespace=namespace)
 
-        setattr(klass, 'make_parser', _make_parser)
+        if not dataclasses.is_dataclass(klass):
+            logger.debug("make %s a dataclass", klass)
+            klass = dataclasses.dataclass(klass)
+
         setattr(klass, 'parse_args', _parse_args)
         setattr(klass, 'parse_known_args', _parse_known_args)
         return klass
-    
+
     return f

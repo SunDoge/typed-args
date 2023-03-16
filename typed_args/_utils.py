@@ -2,6 +2,7 @@ import dataclasses
 import enum
 from typing import Dict, Any, Type, Optional
 from types import DynamicClassAttribute
+import argparse
 
 
 class EnumMember:
@@ -46,7 +47,7 @@ class _Subcommand:
         return _Subcommand(value, name=self.name)
 
     def __repr__(self) -> str:
-        return f'<SubCommand {self.name}: {self.value}>'
+        return f'<_SubCommand {self.name}: {self.value}>'
 
     def __eq__(self, other: '_Subcommand') -> bool:
         # ic(isinstance(self, type(rhs)))
@@ -57,4 +58,16 @@ class _Subcommand:
 
 
 class SubcommandEnum(_Subcommand, enum.Enum):
+    """
+    Black magic!
+    """
     pass
+
+
+class DefaultHelpFormatter(argparse.HelpFormatter):
+
+    def _get_default_metavar_for_optional(self, action: argparse.Action) -> str:
+        return action.dest.split('.')[-1].upper()
+
+    def _get_default_metavar_for_positional(self, action: argparse.Action) -> str:
+        return action.dest.split('.')[-1]

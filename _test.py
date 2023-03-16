@@ -1,28 +1,28 @@
-import dataclasses
 import typed_args as ta
 from icecream import ic
 import logging
+import pickle
 
 
-@dataclasses.dataclass
+@ta.dataclass
 class Group1:
     x2: str = ta.add_argument('--x2')
     x3: str = ta.add_argument('--x3')
 
 
-@dataclasses.dataclass
+@ta.dataclass
 class Group2:
     x4: str = ta.add_argument('--x4')
     x5: str = ta.add_argument('--x5')
 
 
-@dataclasses.dataclass
+@ta.dataclass
 class Cmd1:
     x6: str = ta.add_argument('--x6')
     x7: str = ta.add_argument('--x7')
 
 
-@dataclasses.dataclass
+@ta.dataclass
 class Cmd2:
     x6: str = ta.add_argument('--x6')
     x7: str = ta.add_argument('--x7')
@@ -35,7 +35,6 @@ class SubCommands(ta.SubcommandEnum):
 
 
 @ta.argument_parser(prog='dddd')
-@dataclasses.dataclass
 class Args:
     x1: str = ta.add_argument()
     group1: Group1 = ta.add_argument_group()
@@ -50,6 +49,9 @@ def test():
     args = Args.parse_args()
 
     ic(args)
+    args.group1.x2
+
+    pickle.dumps(args)
 
 
 if __name__ == '__main__':

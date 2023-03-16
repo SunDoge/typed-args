@@ -1,19 +1,15 @@
 import argparse
-from typing import List
-from ._utils import has_dataclass_fields, get_dataclass_fields, get_annotations
-import enum
 import logging
-from icecream import ic
-from ._utils import SubcommandEnum
+from typing import List
+
+from ._utils import SubcommandEnum, get_annotations, get_dataclass_fields
 
 logger = logging.getLogger(__name__)
 
 
 def _set_attr(x, paths: List[str], value):
-    ic(locals())
     if len(paths) == 1:
         setattr(x, paths[0], value)
-        ic('after setattr', x)
     elif len(paths) > 1:
         dataclass_fields = get_dataclass_fields(x)
         field = dataclass_fields.get(paths[0])

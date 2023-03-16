@@ -1,10 +1,9 @@
 import argparse
-from typing import Type, TypeVar, Dict, List, Any, Optional
 import dataclasses
-from icecream import ic
-from ._utils import get_annotations, get_dataclass_fields, get_members
-import logging
 import enum
+import logging
+
+from ._utils import get_annotations, get_dataclass_fields, get_members
 
 logger = logging.getLogger(__name__)
 
@@ -64,12 +63,3 @@ def add_subparsers(*args, **kwargs):
 
 def add_parser(name: str, **kwargs):
     return dict(name=name, kwargs=kwargs)
-
-
-class DefaultHelpFormatter(argparse.HelpFormatter):
-
-    def _get_default_metavar_for_optional(self, action: argparse.Action) -> str:
-        return action.dest.split('.')[-1].upper()
-
-    def _get_default_metavar_for_positional(self, action: argparse.Action) -> str:
-        return action.dest.split('.')[-1]
