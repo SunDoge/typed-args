@@ -1,19 +1,18 @@
 # from typed_args import TypedArgs, add_argument, dataclass
 import pickle
-from dataclasses import dataclass
 from typing import List, Optional
 
 import typed_args as ta
 
 
-@dataclass()
-class Args(ta.TypedArgs):
+@ta.argument_parser()
+class Args:
     foo: Optional[str] = ta.add_argument('--foo')
     bar: List[int] = ta.add_argument(nargs='*', default=[1, 2, 3])
 
 
 def test_pickle():
-    args, _ = Args.from_known_args([])
+    args, _ = Args.parse_known_args(['--foo', '1234'])
     _pickled_args = pickle.dumps(args)
     assert _pickled_args
 

@@ -1,5 +1,4 @@
 import argparse
-from dataclasses import dataclass
 
 import typed_args as ta
 
@@ -23,10 +22,8 @@ parser.add_argument(
 """
 TypedArgs
 """
-
-
-@dataclass
-class Args(ta.TypedArgs):
+@ta.argument_parser()
+class Args:
     data: str = ta.add_argument(
         metavar='DIR', type=str, help='path to dataset'
     )
@@ -50,7 +47,7 @@ def test_args():
     """
     from_args = parse_args, from_known_args = parse_known_args
     """
-    typed_args = Args.from_args(argv)
+    typed_args = Args.parse_args(argv)
     args = parser.parse_args(argv)
 
     assert args.arch == typed_args.arch
