@@ -65,6 +65,9 @@ class SubcommandEnum(_Subcommand, enum.Enum):
 
 
 class DefaultHelpFormatter(argparse.HelpFormatter):
+    """
+    Show FOO instead of GROUP1.FOO as metavar
+    """
 
     def _get_default_metavar_for_optional(self, action: argparse.Action) -> str:
         return action.dest.split('.')[-1].upper()

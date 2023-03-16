@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support `add_argument_group`
 - Support `add_subparsers`
+- Rename `from_args`, `from_known_args` to `parse_args` and `parse_known_args` because `Args` is now a `ArgumentParser`.
 
 ## [0.5.1]
 
