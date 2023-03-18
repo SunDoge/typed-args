@@ -2,6 +2,7 @@ import argparse
 import dataclasses
 import enum
 import logging
+from typing import overload, TypeVar, Type, Optional, Sequence
 
 from ._utils import get_annotations, get_dataclass_fields, get_members
 
@@ -47,6 +48,24 @@ def parse(parser: argparse.ArgumentParser, x):
         _parse_enum(subparsers, x)
     else:
         _parse_dataclass(parser, x)
+
+
+T = TypeVar('T')
+
+
+@overload
+def add_argument(
+    *option_strings: str,
+    action: str = None,
+    nargs: str = None,
+    const: T = None,
+    default: T = None,
+    type: Type[T] = None,
+    choices: Sequence[T] = None,
+    required: bool = None,
+    help: str = None,
+    metavar: str = None,
+) -> T: ...
 
 
 def add_argument(*args, **kwargs):

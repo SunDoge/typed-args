@@ -2,6 +2,7 @@ import argparse
 from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar
 import dataclasses
 import logging
+import enum
 
 from ._assigner import assign
 from ._parser import parse
