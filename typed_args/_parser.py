@@ -2,7 +2,7 @@ import argparse
 import dataclasses
 import enum
 import logging
-from typing import overload, TypeVar, Type, Optional, Sequence
+from typing import overload, TypeVar, Type, Sequence, Union
 
 from ._utils import get_annotations, get_dataclass_fields, get_members
 
@@ -59,13 +59,13 @@ def add_argument(
     action: str = None,
     nargs: str = None,
     const: T = None,
-    default: T = None,
+    default: Union[T, str] = None,
     type: Type[T] = None,
     choices: Sequence[T] = None,
     required: bool = None,
     help: str = None,
     metavar: str = None,
-) -> T: ...
+) -> dataclasses.Field: ...
 
 
 def add_argument(*args, **kwargs):
@@ -76,7 +76,7 @@ def add_argument(*args, **kwargs):
 def add_argument_group(
     title: str = None,
     description: str = None,
-): ...
+) -> dataclasses.Field: ...
 
 
 def add_argument_group(*args, **kwargs):
@@ -93,7 +93,7 @@ def add_subparsers(
     required: bool = None,
     help: str = None,
     metavar: str = None,
-): ...
+) -> dataclasses.Field: ...
 
 
 def add_subparsers(*args, **kwargs):
@@ -105,7 +105,7 @@ def add_parser(
     name: str,
     prog: str = None,
     aliases: Sequence[str] = None,
-): ...
+) -> dict: ...
 
 
 def add_parser(name: str, **kwargs):
