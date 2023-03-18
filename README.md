@@ -7,8 +7,11 @@ This project is inspired by [TeXitoi/structopt](https://github.com/TeXitoi/struc
 
 ## Introduction
 
-`typed-args` is a Python package for creating command line interfaces in a type-annotated way with standard python library `argparse`. 
-The program defines what arguments it requires, and `typed-args` will figure out how to parse them out of `sys.argv`.
+`typed-args` is a Python package for creating command line interfaces with type annotations. 
+The program defines what arguments it requires, and `typed-args` will figure out how to parse them out of `sys.argv`. 
+`typed-args` use standard python library `argparse` and `dataclasses` so no need to install any dependencies after Python 3.6. 
+Its API is very similar to `argparse`. 
+
 
 What does it look like? Here is an [example](https://docs.python.org/3/library/argparse.html#example) from `argparse` docs and is rewritten with `typed-args`:
 
