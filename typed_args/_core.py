@@ -1,5 +1,5 @@
 import argparse
-from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar
+from typing import Generic, List, Optional, Sequence, Tuple, Type, TypeVar, overload, Callable
 import dataclasses
 import logging
 
@@ -51,6 +51,24 @@ class _Parsable(Generic[T]):
     @classmethod
     def parse_known_args(cls, args: Optional[Sequence[str]] = None, namespace:  Optional[argparse.Namespace] = None) -> Tuple[T, List[str]]:
         pass
+
+
+@overload
+def argument_parser(
+    prog: str = None,
+    usage: str = None,
+    description: str = None,
+    epilog: str = None,
+    parents: List[argparse.ArgumentParser] = None,
+    formatter_class: argparse.HelpFormatter = None,
+    prefix_chars: str = '-',
+    fromfile_prefix_chars: str = None,
+    argument_default=None,
+    conflict_handler=None,
+    add_help: bool = True,
+    allow_abbrev: bool = True,
+    exit_on_error: bool = True,
+) -> Callable[[Type[T]], _Parsable[T]]: ...
 
 
 def argument_parser(**kwargs):

@@ -2,6 +2,7 @@ import argparse
 import dataclasses
 import enum
 import logging
+from typing import overload, TypeVar, Type, Optional, Sequence
 
 from ._utils import get_annotations, get_dataclass_fields, get_members
 
@@ -49,16 +50,62 @@ def parse(parser: argparse.ArgumentParser, x):
         _parse_dataclass(parser, x)
 
 
+T = TypeVar('T')
+
+
+@overload
+def add_argument(
+    *option_strings: str,
+    action: str = None,
+    nargs: str = None,
+    const: T = None,
+    default: T = None,
+    type: Type[T] = None,
+    choices: Sequence[T] = None,
+    required: bool = None,
+    help: str = None,
+    metavar: str = None,
+) -> T: ...
+
+
 def add_argument(*args, **kwargs):
     return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_argument'))
+
+
+@overload
+def add_argument_group(
+    title: str = None,
+    description: str = None,
+): ...
 
 
 def add_argument_group(*args, **kwargs):
     return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_argument_group'))
 
 
+@overload
+def add_subparsers(
+    title: str = None,
+    description: str = None,
+    prog: str = None,
+    parser_class: Type[argparse.ArgumentParser] = None,
+    action=None,
+    required: bool = None,
+    help: str = None,
+    metavar: str = None,
+): ...
+
+
 def add_subparsers(*args, **kwargs):
     return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_subparsers'))
+
+
+@overload
+def add_parser(
+    name: str,
+    prog: str = None,
+    aliases: Sequence[str] = None,
+): ...
 
 
 def add_parser(name: str, **kwargs):
