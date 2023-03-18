@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.1]
 
-- Add @overload for API.
+- Add `@overload` for API.
 
 ## [0.6.0]
 
