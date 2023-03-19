@@ -18,7 +18,7 @@ def test_name_or_flags():
 
     # with pytest.raises()
     with pytest.raises(SystemExit) as e:
-        args3 = Args.parse_args(['--foo', 'FOO'])
+        _args3 = Args.parse_args(['--foo', 'FOO'])
     assert e.value.code == 2
 
 

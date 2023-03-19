@@ -18,8 +18,10 @@ def parse_args(
     args: Optional[Sequence[str]] = None,
     namespace:  Optional[argparse.Namespace] = None,
 ) -> T:
+    assert dataclasses.is_dataclass(
+        klass), "{} must be dataclass".format(klass)
     if not parser:
-        parser = argparse.ArgumentParser()
+        parser = _make_parser(klass)
     parse(parser, klass)
     ns = parser.parse_args(args=args, namespace=namespace)
     opts = klass()
@@ -33,8 +35,10 @@ def parse_known_args(
     args: Optional[Sequence[str]] = None,
     namespace:  Optional[argparse.Namespace] = None,
 ) -> Tuple[T, List[str]]:
+    assert dataclasses.is_dataclass(
+        klass), "{} must be dataclass".format(klass)
     if not parser:
-        parser = argparse.ArgumentParser()
+        parser = _make_parser(klass)
     parse(parser, klass)
     ns, unknown = parser.parse_known_args(args=args, namespace=namespace)
     opts = klass()
@@ -43,13 +47,22 @@ def parse_known_args(
 
 
 class TypedArgs:
-    @classmethod
-    def parse_args(cls: Type[T], args: Optional[Sequence[str]] = None, namespace:  Optional[argparse.Namespace] = None) -> T:
-        pass
 
     @classmethod
-    def parse_known_args(cls: Type[T], args: Optional[Sequence[str]] = None, namespace:  Optional[argparse.Namespace] = None) -> Tuple[T, List[str]]:
-        pass
+    def parse_args(
+        cls: Type[T],
+        args: Optional[Sequence[str]] = None,
+        namespace:  Optional[argparse.Namespace] = None
+    ) -> T:
+        return parse_args(cls, args=args, namespace=namespace)
+
+    @classmethod
+    def parse_known_args(
+        cls: Type[T],
+        args: Optional[Sequence[str]] = None,
+        namespace:  Optional[argparse.Namespace] = None
+    ) -> Tuple[T, List[str]]:
+        return parse_known_args(cls, args=args, namespace=namespace)
 
 
 @overload
@@ -73,23 +86,22 @@ def argument_parser(
 def argument_parser(**kwargs):
 
     def f(klass):
-        def _make_parser():
+        def make_parser():
             return argparse.ArgumentParser(**kwargs)
-
-        def _parse_args(args=None, namespace=None):
-            parser = _make_parser()
-            return parse_args(klass, parser=parser, args=args, namespace=namespace)
-
-        def _parse_known_args(args=None, namespace=None):
-            parser = _make_parser()
-            return parse_known_args(klass, parser=parser, args=args, namespace=namespace)
 
         if not dataclasses.is_dataclass(klass):
             logger.debug("make %s a dataclass", klass)
             klass = dataclasses.dataclass(klass)
 
-        setattr(klass, 'parse_args', _parse_args)
-        setattr(klass, 'parse_known_args', _parse_known_args)
+        setattr(klass, '__make_parser', make_parser)
         return klass
 
     return f
+
+
+def _make_parser(klass):
+    if hasattr(klass, '__make_parser'):
+        parser = getattr(klass, '__make_parser')()
+    else:
+        parser = argparse.ArgumentParser()
+    return parser

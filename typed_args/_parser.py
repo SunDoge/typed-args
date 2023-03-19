@@ -69,7 +69,10 @@ def add_argument(
 
 
 def add_argument(*args, **kwargs):
-    return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_argument'))
+    return dataclasses.field(
+        default=None,
+        metadata=dict(args=args, kwargs=kwargs, action='add_argument')
+    )
 
 
 @overload
@@ -80,7 +83,10 @@ def add_argument_group(
 
 
 def add_argument_group(*args, **kwargs):
-    return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_argument_group'))
+    return dataclasses.field(
+        default=None,
+        metadata=dict(args=args, kwargs=kwargs, action='add_argument_group')
+    )
 
 
 @overload
@@ -97,7 +103,10 @@ def add_subparsers(
 
 
 def add_subparsers(*args, **kwargs):
-    return dataclasses.field(default=None, metadata=dict(args=args, kwargs=kwargs, action='add_subparsers'))
+    return dataclasses.field(
+        default=None,
+        metadata=dict(args=args, kwargs=kwargs, action='add_subparsers')
+    )
 
 
 @overload
