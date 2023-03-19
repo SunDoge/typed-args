@@ -8,7 +8,7 @@ except ImportError as e:
     raise e
 
 
-from ._core import parse_args, parse_known_args, argument_parser
+from ._core import parse_args, parse_known_args, argument_parser, TypedArgs
 from ._parser import add_argument, add_argument_group, add_parser, add_subparsers
 from ._utils import SubcommandEnum, DefaultHelpFormatter
 from argparse import SUPPRESS, OPTIONAL, ZERO_OR_MORE, ONE_OR_MORE, REMAINDER
@@ -17,7 +17,7 @@ __version__ = "0.6.1"
 
 __all__ = [
     'dataclass',
-    'parse_args', 'parse_known_args', 'argument_parser',
+    'parse_args', 'parse_known_args', 'argument_parser', 'TypedArgs',
     'add_argument', 'add_argument_group', 'add_parser', 'add_subparsers',
     'SubcommandEnum', 'DefaultHelpFormatter',
     'SUPPRESS', 'OPTIONAL', 'ZERO_OR_MORE', 'ONE_OR_MORE', 'REMAINDER',

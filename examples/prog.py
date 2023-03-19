@@ -5,7 +5,7 @@ from typing import List, Callable
 @ta.argument_parser(
     description='Process some integers.'
 )
-class Args:
+class Args(ta.TypedArgs):
     integers: List[int] = ta.add_argument(
         metavar='N', type=int, nargs='+',
         help='an integer for the accumulator'
