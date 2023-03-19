@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "typed-args"
-version = "0.6.1"
+version = "0.6.2"
 description = "Parse command line arguments by defining dataclasses"
 authors = ["SunDoge <384813529@qq.com>"]
 readme = "README.md"

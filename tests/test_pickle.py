@@ -6,7 +6,7 @@ import typed_args as ta
 
 
 @ta.argument_parser()
-class Args:
+class Args(ta.TypedArgs):
     foo: Optional[str] = ta.add_argument('--foo')
     bar: List[int] = ta.add_argument(nargs='*', default=[1, 2, 3])
 

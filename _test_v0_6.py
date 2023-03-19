@@ -35,7 +35,7 @@ class SubCommands(ta.SubcommandEnum):
 
 
 @ta.argument_parser(prog='dddd')
-class Args:
+class Args(ta.TypedArgs):
     x1: str = ta.add_argument()
     group1: Group1 = ta.add_argument_group()
     group2: Group2 = ta.add_argument_group()

@@ -23,7 +23,7 @@ parser.add_argument(
 TypedArgs
 """
 @ta.argument_parser()
-class Args:
+class Args(ta.TypedArgs):
     data: str = ta.add_argument(
         metavar='DIR', type=str, help='path to dataset'
     )
