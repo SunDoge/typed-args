@@ -49,7 +49,7 @@ def parse_known_args(
 class TypedArgs:
 
     @classmethod
-    def from_args(
+    def parse_args(
         cls: Type[T],
         args: Optional[Sequence[str]] = None,
         namespace:  Optional[argparse.Namespace] = None
@@ -57,7 +57,7 @@ class TypedArgs:
         return parse_args(cls, args=args, namespace=namespace)
 
     @classmethod
-    def from_known_args(
+    def parse_known_args(
         cls: Type[T],
         args: Optional[Sequence[str]] = None,
         namespace:  Optional[argparse.Namespace] = None
