@@ -6,7 +6,7 @@ import typed_args as ta
 
 def test_name_or_flags():
     @ta.argument_parser()
-    class Args:
+    class Args(ta.TypedArgs):
         foo: str = ta.add_argument('-f', '--foo')
         bar: str = ta.add_argument()
 
@@ -24,7 +24,7 @@ def test_name_or_flags():
 
 def test_store_action():
     @ta.argument_parser()
-    class Args:
+    class Args(ta.TypedArgs):
         foo: str = ta.add_argument('--foo')
 
     args = Args.parse_args('--foo 1'.split())
@@ -33,7 +33,7 @@ def test_store_action():
 
 def test_store_const_action():
     @ta.argument_parser()
-    class Args:
+    class Args(ta.TypedArgs):
         foo: int = ta.add_argument('--foo', action='store_const', const=42)
 
     args = Args.parse_args(['--foo'])

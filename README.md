@@ -23,7 +23,7 @@ from typing import List, Callable
 @ta.argument_parser(
     description='Process some integers.'
 )
-class Args:
+class Args(ta.TypedArgs):
     integers: List[int] = ta.add_argument(
         metavar='N', type=int, nargs='+',
         help='an integer for the accumulator'
@@ -110,7 +110,7 @@ parser = argparse.ArgumentParser(prog='ProgramName')
 import typed_args as ta
 
 @ta.argument_parser(prog='ProgramName')
-class Args:
+class Args(ta.TypedArgs):
     pass
 ```
 
@@ -133,7 +133,7 @@ parser.add_argument('-v', '--verbose',
 import typed_args as ta
 
 @ta.argument_parser()
-class Args:
+class Args(ta.TypedArgs):
     filename: str = ta.add_argument()                    # positional argument, use the attribute name automatically
     count: str = ta.add_argument('-c', '--count')        # option that takes a value, also can be annotated as Optional[str]
     verbose: bool = ta.add_argument('-v', '--verbose', 

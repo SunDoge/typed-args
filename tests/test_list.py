@@ -10,7 +10,7 @@ def test_list():
     """
 
     @ta.argument_parser()
-    class Args:
+    class Args(ta.TypedArgs):
         foo: List[str] = ta.add_argument('--foo', nargs=2, type=str)
         bar: List[str] = ta.add_argument(nargs=1, type=str)
 
@@ -22,7 +22,7 @@ def test_list():
 
 def test_default_list():
     @ta.argument_parser()
-    class Args:
+    class Args(ta.TypedArgs):
         foo: int = ta.add_argument('--foo', type=int, default=42)
         bar: List[int] = ta.add_argument(nargs='*', default=[1, 2, 3])
         config: List[str] = ta.add_argument(
