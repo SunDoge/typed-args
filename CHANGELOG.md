@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.3]
 
-- Rename `parse_args`, `parse_known_args` to `from_args` and `from_known_args` because `Args` is no a `ArgumentParser` now.
+- Update `class TypedArgs`.
 
 ## [0.6.2]
 
