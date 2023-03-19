@@ -74,3 +74,9 @@ class DefaultHelpFormatter(argparse.HelpFormatter):
 
     def _get_default_metavar_for_positional(self, action: argparse.Action) -> str:
         return action.dest.split('.')[-1]
+
+
+# @dataclasses.dataclass
+# class _Params:
+#     args: tuple
+#     kwargs: dict
