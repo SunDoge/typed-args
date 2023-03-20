@@ -2,8 +2,17 @@
 name = "typed-args"
 version = "0.6.3"
 description = "Parse command line arguments by defining dataclasses"
+license = "BSD-3-Clause"
 authors = ["SunDoge <384813529@qq.com>"]
 readme = "README.md"
+homepage = "https://github.com/SunDoge/typed-args"
+repository = "https://github.com/SunDoge/typed-args"
+keywords = ["argparse", "cli"]
+classifiers = [
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
