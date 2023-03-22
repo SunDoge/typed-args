@@ -57,6 +57,10 @@ def parse(parser: argparse.ArgumentParser, x):
 
 def _parse_attribute_docstring(x):
     source = inspect.getsource(x)
+    """
+    https://stackoverflow.com/questions/41882261/reduce-indentation-of-nested-functions-in-python-code-generation
+    We dedent the code to support class in function
+    """
     source = textwrap.dedent(source)
     module = ast.parse(source)
     class_def: ast.ClassDef = module.body[0]
