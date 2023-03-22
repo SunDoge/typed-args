@@ -13,7 +13,7 @@ from ._parser import add_argument, add_argument_group, add_parser, add_subparser
 from ._utils import SubcommandEnum, DefaultHelpFormatter
 from argparse import SUPPRESS, OPTIONAL, ZERO_OR_MORE, ONE_OR_MORE, REMAINDER
 
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 
 __all__ = [
     'dataclass',

@@ -26,6 +26,10 @@ def has_dataclass_fields(x):
     return hasattr(x, '__dataclass_fields__')
 
 
+def get_doc(x) -> Optional[str]:
+    return getattr(x, '__doc__')
+
+
 class _Subcommand:
 
     def __init__(self, value, name: Optional[str] = None) -> None:

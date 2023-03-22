@@ -2,7 +2,10 @@ import argparse
 import dataclasses
 import enum
 import logging
-from typing import overload, TypeVar, Type, Sequence, Union
+from typing import overload, TypeVar, Type, Sequence, Union, Dict
+import ast
+import inspect
+import textwrap
 
 from ._utils import get_annotations, get_dataclass_fields, get_members
 
@@ -10,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _parse_dataclass(parser: argparse.ArgumentParser, x, prefix: str = ''):
+    _parse_attribute_docstring(x)
     fields = get_dataclass_fields(x)
 
     for name, field in fields.items():
@@ -47,7 +51,47 @@ def parse(parser: argparse.ArgumentParser, x):
         subparsers = parser.add_subparsers()
         _parse_enum(subparsers, x)
     else:
+
         _parse_dataclass(parser, x)
+
+
+def _parse_attribute_docstring(x):
+    source = inspect.getsource(x)
+    source = textwrap.dedent(source)
+    module = ast.parse(source)
+    class_def: ast.ClassDef = module.body[0]
+    ann_assign_indices = [
+        i for i, x in enumerate(class_def.body)
+        if isinstance(x, ast.AnnAssign)
+    ]
+    num_keys = len(class_def.body)
+    res = {}
+    """
+    class ClassDef:
+        AnnAssign target = value
+        Expr(Constant)
+    """
+    for ann_assign_idx in ann_assign_indices:
+        expr_idx = ann_assign_idx + 1
+        if expr_idx >= num_keys:
+            continue
+        expr = class_def.body[expr_idx]
+        if not isinstance(expr, ast.Expr):
+            continue
+        ann_assign: ast.AnnAssign = class_def.body[ann_assign_idx]
+        key: str = ann_assign.target.id
+        constant: ast.Constant = expr.value
+        value: str = constant.value
+        # TODO: we may have to strip the value
+        res[key] = value
+
+    dataclass_fields = get_dataclass_fields(x)
+    for key, value in res.items():
+        field = dataclass_fields[key]
+        if field.metadata.get('action') == 'add_argument':
+            kwargs = field.metadata.get('kwargs')
+            if 'help' not in kwargs:
+                kwargs['help'] = value
 
 
 T = TypeVar('T')

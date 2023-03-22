@@ -2,14 +2,24 @@ import argparse
 from typing import List, Optional, Sequence, Tuple, Type, TypeVar, overload, Callable
 import dataclasses
 import logging
+import ast
 
 from ._assigner import assign
 from ._parser import parse
+from ._utils import get_doc
 
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar('T')
+
+
+def _make_parser(klass) -> argparse.ArgumentParser:
+    if hasattr(klass, '__make_parser'):
+        parser = getattr(klass, '__make_parser')()
+    else:
+        parser = argparse.ArgumentParser()
+    return parser
 
 
 def parse_args(
@@ -86,8 +96,14 @@ def argument_parser(
 def argument_parser(**kwargs):
 
     def f(klass):
+        description = get_doc(klass)
+
         def make_parser():
-            return argparse.ArgumentParser(**kwargs)
+            if 'description' not in kwargs and description is not None:
+                logger.debug('Get description from __doc__: %s', description)
+                return argparse.ArgumentParser(description=description, **kwargs)
+            else:
+                return argparse.ArgumentParser(**kwargs)
 
         if not dataclasses.is_dataclass(klass):
             logger.debug("make %s a dataclass", klass)
@@ -97,11 +113,3 @@ def argument_parser(**kwargs):
         return klass
 
     return f
-
-
-def _make_parser(klass):
-    if hasattr(klass, '__make_parser'):
-        parser = getattr(klass, '__make_parser')()
-    else:
-        parser = argparse.ArgumentParser()
-    return parser
