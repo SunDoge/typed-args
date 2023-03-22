@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.4]
+
+- Parse doc for class as description.
+- Parse doc for class attributes as help.
+
 ## [0.6.3]
 
 - Update `class TypedArgs`.
@@ -77,6 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace attributes by name
 
 [unreleased]: https://github.com/SunDoge/typed-args
+[0.6.4]: https://github.com/SunDoge/typed-args/tree/v0.6.4
 [0.6.3]: https://github.com/SunDoge/typed-args/tree/v0.6.3
 [0.6.2]: https://github.com/SunDoge/typed-args/tree/v0.6.2
 [0.6.1]: https://github.com/SunDoge/typed-args/tree/v0.6.1

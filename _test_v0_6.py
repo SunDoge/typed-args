@@ -13,7 +13,12 @@ class Group1:
 @ta.dataclass
 class Group2:
     x4: str = ta.add_argument('--x4')
+    """
+    x4 in group2
+    """
+
     x5: str = ta.add_argument('--x5')
+    """x5 in group2"""
 
 
 @ta.dataclass

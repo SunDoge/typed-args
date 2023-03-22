@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "typed-args"
-version = "0.6.3"
+version = "0.6.4"
 description = "Parse command line arguments by defining dataclasses"
 license = "BSD-3-Clause"
 authors = ["SunDoge <384813529@qq.com>"]
