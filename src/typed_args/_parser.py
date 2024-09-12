@@ -6,6 +6,8 @@ from typing import overload, TypeVar, Type, Sequence, Union, Dict
 import ast
 import inspect
 import textwrap
+import typing
+
 
 from ._utils import get_annotations, get_dataclass_fields, get_members
 
@@ -61,7 +63,7 @@ def _parse_attribute_docstring(x):
     """
     source = textwrap.dedent(source)
     module = ast.parse(source)
-    class_def: ast.ClassDef = module.body[0]
+    class_def = typing.cast(ast.ClassDef, module.body[0])
     ann_assign_indices = [
         i for i, x in enumerate(class_def.body) if isinstance(x, ast.AnnAssign)
     ]
@@ -79,7 +81,7 @@ def _parse_attribute_docstring(x):
         expr = class_def.body[expr_idx]
         if not isinstance(expr, ast.Expr):
             continue
-        ann_assign: ast.AnnAssign = class_def.body[ann_assign_idx]
+        ann_assign = typing.cast(ast.AnnAssign, class_def.body[ann_assign_idx])
         key: str = ann_assign.target.id
         constant: ast.Constant = expr.value
         value: str = constant.value
@@ -90,7 +92,7 @@ def _parse_attribute_docstring(x):
     for key, value in res.items():
         field = dataclass_fields[key]
         if field.metadata.get("action") == "add_argument":
-            kwargs = field.metadata.get("kwargs")
+            kwargs = typing.cast(Dict, field.metadata.get("kwargs"))
             if "help" not in kwargs:
                 kwargs["help"] = value
 
@@ -102,15 +104,15 @@ R = TypeVar("R")
 @overload
 def add_argument(
     *option_strings: str,
-    action: str = None,
-    nargs: str = None,
-    const: T = None,
-    default: Union[T, str] = None,
-    type: Type[T] = None,
-    choices: Sequence[T] = None,
-    required: bool = None,
-    help: str = None,
-    metavar: str = None,
+    action: str = ...,
+    nargs: str | int = ...,
+    const: T = ...,
+    default: Union[T, str] = ...,
+    type: Type[T] = ...,
+    choices: Sequence[T] = ...,
+    required: bool = ...,
+    help: str = ...,
+    metavar: str = ...,
 ) -> R: ...
 
 
@@ -122,8 +124,8 @@ def add_argument(*args, **kwargs):
 
 @overload
 def add_argument_group(
-    title: str = None,
-    description: str = None,
+    title: str = ...,
+    description: str = ...,
 ) -> dataclasses.Field: ...
 
 
@@ -136,14 +138,14 @@ def add_argument_group(*args, **kwargs):
 
 @overload
 def add_subparsers(
-    title: str = None,
-    description: str = None,
-    prog: str = None,
-    parser_class: Type[argparse.ArgumentParser] = None,
-    action=None,
-    required: bool = None,
-    help: str = None,
-    metavar: str = None,
+    title: str = ...,
+    description: str = ...,
+    prog: str = ...,
+    parser_class: Type[argparse.ArgumentParser] = ...,
+    action=...,
+    required: bool = ...,
+    help: str = ...,
+    metavar: str = ...,
 ) -> R: ...
 
 
@@ -156,8 +158,8 @@ def add_subparsers(*args, **kwargs):
 @overload
 def add_parser(
     name: str,
-    prog: str = None,
-    aliases: Sequence[str] = None,
+    prog: str = ...,
+    aliases: Sequence[str] = ...,
 ) -> dict: ...
 
 
