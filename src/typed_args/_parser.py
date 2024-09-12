@@ -12,38 +12,37 @@ from ._utils import get_annotations, get_dataclass_fields, get_members
 logger = logging.getLogger(__name__)
 
 
-def _parse_dataclass(parser: argparse.ArgumentParser, x, prefix: str = ''):
+def _parse_dataclass(parser: argparse.ArgumentParser, x, prefix: str = ""):
     _parse_attribute_docstring(x)
     fields = get_dataclass_fields(x)
 
     for name, field in fields.items():
-        action = field.metadata.get('action')
+        action = field.metadata.get("action")
         dest = prefix + name
-        if action == 'add_argument':
-            args = field.metadata.get('args')
-            kwargs = field.metadata.get('kwargs')
+        if action == "add_argument":
+            args = field.metadata.get("args")
+            kwargs = field.metadata.get("kwargs")
             parser.add_argument(*args, dest=dest, **kwargs)
-        elif action == 'add_argument_group':
+        elif action == "add_argument_group":
             group = parser.add_argument_group(title=name)
-            _parse_dataclass(group, field.type, prefix=dest + '.')
-        elif action == 'add_subparsers':
-            args = field.metadata.get('args')
-            kwargs = field.metadata.get('kwargs')
+            _parse_dataclass(group, field.type, prefix=dest + ".")
+        elif action == "add_subparsers":
+            args = field.metadata.get("args")
+            kwargs = field.metadata.get("kwargs")
             subparsers = parser.add_subparsers(*args, **kwargs)
-            _parse_enum(subparsers, field.type, prefix=dest + '.')
+            _parse_enum(subparsers, field.type, prefix=dest + ".")
 
 
-def _parse_enum(subparsers: argparse._SubParsersAction, x, prefix: str = ''):
+def _parse_enum(subparsers: argparse._SubParsersAction, x, prefix: str = ""):
     members = get_members(x)
     annotations = get_annotations(x)
 
     for member in members.values():
-        name = member.value.get('name')
-        kwargs = member.value.get('kwargs')
+        name = member.value.get("name")
+        kwargs = member.value.get("kwargs")
         dest = prefix + member.name
         parser = subparsers.add_parser(name, **kwargs)
-        _parse_dataclass(parser, annotations.get(
-            member.name), prefix=dest + '.')
+        _parse_dataclass(parser, annotations.get(member.name), prefix=dest + ".")
 
 
 def parse(parser: argparse.ArgumentParser, x):
@@ -51,7 +50,6 @@ def parse(parser: argparse.ArgumentParser, x):
         subparsers = parser.add_subparsers()
         _parse_enum(subparsers, x)
     else:
-
         _parse_dataclass(parser, x)
 
 
@@ -65,8 +63,7 @@ def _parse_attribute_docstring(x):
     module = ast.parse(source)
     class_def: ast.ClassDef = module.body[0]
     ann_assign_indices = [
-        i for i, x in enumerate(class_def.body)
-        if isinstance(x, ast.AnnAssign)
+        i for i, x in enumerate(class_def.body) if isinstance(x, ast.AnnAssign)
     ]
     num_keys = len(class_def.body)
     res = {}
@@ -92,13 +89,14 @@ def _parse_attribute_docstring(x):
     dataclass_fields = get_dataclass_fields(x)
     for key, value in res.items():
         field = dataclass_fields[key]
-        if field.metadata.get('action') == 'add_argument':
-            kwargs = field.metadata.get('kwargs')
-            if 'help' not in kwargs:
-                kwargs['help'] = value
+        if field.metadata.get("action") == "add_argument":
+            kwargs = field.metadata.get("kwargs")
+            if "help" not in kwargs:
+                kwargs["help"] = value
 
 
-T = TypeVar('T')
+T = TypeVar("T")
+R = TypeVar("R")
 
 
 @overload
@@ -113,13 +111,12 @@ def add_argument(
     required: bool = None,
     help: str = None,
     metavar: str = None,
-) -> dataclasses.Field: ...
+) -> R: ...
 
 
 def add_argument(*args, **kwargs):
     return dataclasses.field(
-        default=None,
-        metadata=dict(args=args, kwargs=kwargs, action='add_argument')
+        default=None, metadata=dict(args=args, kwargs=kwargs, action="add_argument")
     )
 
 
@@ -133,7 +130,7 @@ def add_argument_group(
 def add_argument_group(*args, **kwargs):
     return dataclasses.field(
         default=None,
-        metadata=dict(args=args, kwargs=kwargs, action='add_argument_group')
+        metadata=dict(args=args, kwargs=kwargs, action="add_argument_group"),
     )
 
 
@@ -147,13 +144,12 @@ def add_subparsers(
     required: bool = None,
     help: str = None,
     metavar: str = None,
-) -> dataclasses.Field: ...
+) -> R: ...
 
 
 def add_subparsers(*args, **kwargs):
     return dataclasses.field(
-        default=None,
-        metadata=dict(args=args, kwargs=kwargs, action='add_subparsers')
+        default=None, metadata=dict(args=args, kwargs=kwargs, action="add_subparsers")
     )
 
 
