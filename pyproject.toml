@@ -12,14 +12,16 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = ["argparse", "cli"]
+authors = [{ name = "SunDoge", email = "triplez0@outlook.com" }]
 
+
+[project.urls]
+Homepage = "https://github.com/SunDoge/typed-args"
+Repository = "https://github.com/SunDoge/typed-args"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.uv]
-dev-dependencies = [
-    "pytest",
-    "icecream",
-]
+dev-dependencies = ["pytest", "icecream"]
