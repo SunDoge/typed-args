@@ -11,12 +11,12 @@ from ._utils import get_doc
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def _make_parser(klass) -> argparse.ArgumentParser:
-    if hasattr(klass, '__make_parser'):
-        parser = getattr(klass, '__make_parser')()
+    if hasattr(klass, "__make_parser"):
+        parser = getattr(klass, "__make_parser")()
     else:
         parser = argparse.ArgumentParser()
     return parser
@@ -26,10 +26,9 @@ def parse_args(
     klass: Type[T],
     parser: Optional[argparse.ArgumentParser] = None,
     args: Optional[Sequence[str]] = None,
-    namespace:  Optional[argparse.Namespace] = None,
+    namespace: Optional[argparse.Namespace] = None,
 ) -> T:
-    assert dataclasses.is_dataclass(
-        klass), "{} must be dataclass".format(klass)
+    assert dataclasses.is_dataclass(klass), "{} must be dataclass".format(klass)
     if not parser:
         parser = _make_parser(klass)
     parse(parser, klass)
@@ -43,10 +42,9 @@ def parse_known_args(
     klass: Type[T],
     parser: Optional[argparse.ArgumentParser] = None,
     args: Optional[Sequence[str]] = None,
-    namespace:  Optional[argparse.Namespace] = None,
+    namespace: Optional[argparse.Namespace] = None,
 ) -> Tuple[T, List[str]]:
-    assert dataclasses.is_dataclass(
-        klass), "{} must be dataclass".format(klass)
+    assert dataclasses.is_dataclass(klass), "{} must be dataclass".format(klass)
     if not parser:
         parser = _make_parser(klass)
     parse(parser, klass)
@@ -57,12 +55,11 @@ def parse_known_args(
 
 
 class TypedArgs:
-
     @classmethod
     def parse_args(
         cls: Type[T],
         args: Optional[Sequence[str]] = None,
-        namespace:  Optional[argparse.Namespace] = None
+        namespace: Optional[argparse.Namespace] = None,
     ) -> T:
         return parse_args(cls, args=args, namespace=namespace)
 
@@ -70,21 +67,21 @@ class TypedArgs:
     def parse_known_args(
         cls: Type[T],
         args: Optional[Sequence[str]] = None,
-        namespace:  Optional[argparse.Namespace] = None
+        namespace: Optional[argparse.Namespace] = None,
     ) -> Tuple[T, List[str]]:
         return parse_known_args(cls, args=args, namespace=namespace)
 
 
 @overload
 def argument_parser(
-    prog: str = None,
-    usage: str = None,
-    description: str = None,
-    epilog: str = None,
-    parents: List[argparse.ArgumentParser] = None,
-    formatter_class: argparse.HelpFormatter = None,
-    prefix_chars: str = '-',
-    fromfile_prefix_chars: str = None,
+    prog: str = ...,
+    usage: str = ...,
+    description: str = ...,
+    epilog: str = ...,
+    parents: List[argparse.ArgumentParser] = ...,
+    formatter_class: argparse.HelpFormatter = ...,
+    prefix_chars: str = "-",
+    fromfile_prefix_chars: str = ...,
     argument_default=None,
     conflict_handler=None,
     add_help: bool = True,
@@ -94,13 +91,12 @@ def argument_parser(
 
 
 def argument_parser(**kwargs):
-
     def f(klass):
         description = get_doc(klass)
 
         def make_parser():
-            if 'description' not in kwargs and description is not None:
-                logger.debug('Get description from __doc__: %s', description)
+            if "description" not in kwargs and description is not None:
+                logger.debug("Get description from __doc__: %s", description)
                 return argparse.ArgumentParser(description=description, **kwargs)
             else:
                 return argparse.ArgumentParser(**kwargs)
@@ -109,7 +105,7 @@ def argument_parser(**kwargs):
             logger.debug("make %s a dataclass", klass)
             klass = dataclasses.dataclass(klass)
 
-        setattr(klass, '__make_parser', make_parser)
+        setattr(klass, "__make_parser", make_parser)
         return klass
 
     return f

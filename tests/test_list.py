@@ -11,22 +11,23 @@ def test_list():
 
     @ta.argument_parser()
     class Args(ta.TypedArgs):
-        foo: List[str] = ta.add_argument('--foo', nargs=2, type=str)
+        foo: List[str] = ta.add_argument("--foo", nargs=2, type=str)
         bar: List[str] = ta.add_argument(nargs=1, type=str)
 
-    args = Args.parse_args('c --foo a b'.split())
+    args = Args.parse_args("c --foo a b".split())
 
-    assert args.foo == ['a', 'b']
-    assert args.bar == ['c']
+    assert args.foo == ["a", "b"]
+    assert args.bar == ["c"]
 
 
 def test_default_list():
     @ta.argument_parser()
     class Args(ta.TypedArgs):
-        foo: int = ta.add_argument('--foo', type=int, default=42)
-        bar: List[int] = ta.add_argument(nargs='*', default=[1, 2, 3])
+        foo: int = ta.add_argument("--foo", type=int, default=42)
+        bar: List[int] = ta.add_argument(nargs="*", default=[1, 2, 3])
         config: List[str] = ta.add_argument(
-            '--config', default=[], type=str, action='append')
+            "--config", default=[], type=str, action="append"
+        )
 
     args = Args.parse_args([])
 

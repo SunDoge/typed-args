@@ -9,7 +9,9 @@ class Args(ta.TypedArgs):
     """
 
     integers: List[int] = ta.add_argument(
-        metavar='N', type=int, nargs='+',
+        metavar="N",
+        type=int,
+        nargs="+",
         # help='an integer for the accumulator'
     )
     """
@@ -17,10 +19,11 @@ class Args(ta.TypedArgs):
     """
 
     accumulate: Callable[[List[int]], int] = ta.add_argument(
-        '--sum',
-        action='store_const',
-        const=sum, default=max,
-        help='sum the integers (default: find the max)'
+        "--sum",
+        action="store_const",
+        const=sum,
+        default=max,
+        help="sum the integers (default: find the max)",
     )
 
 
