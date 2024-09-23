@@ -105,7 +105,7 @@ R = TypeVar("R")
 def add_argument(
     *option_strings: str,
     action: str = ...,
-    nargs: str | int = ...,
+    nargs: typing.Union[str, int] = ...,
     const: T = ...,
     default: Union[T, str] = ...,
     type: Type[T] = ...,
@@ -160,7 +160,7 @@ def add_parser(
     name: str,
     prog: str = ...,
     aliases: Sequence[str] = ...,
-) -> dict: ...
+): ...
 
 
 def add_parser(name: str, **kwargs):
