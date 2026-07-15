@@ -4,6 +4,7 @@ import argparse
 from typing import Optional
 
 from pydantic import ConfigDict
+from ._formatter import DefaultHelpFormatter
 
 
 class ParserConfig(ConfigDict, total=False):

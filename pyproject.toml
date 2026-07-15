@@ -5,7 +5,7 @@ description = "Parse command line arguments by defining pydantic models"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "SunDoge", email = "triplez0@outlook.com" }]
-keywords = ["argparse", "cli", "pydantic", "clap"]
+keywords = ["argparse", "clap", "cli", "pydantic"]
 classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
@@ -16,15 +16,14 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "pydantic>=2.0,<3",
+  "pydantic>=2.0,<3",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=7.0.1",
 ]
 
 [build-system]
 requires = ["uv_build>=0.11.26,<0.12.0"]
 build-backend = "uv_build"
-
-[dependency-groups]
-dev = [
-    "pytest>=7.0.1",
-    "rich>=15.0.0",
-]

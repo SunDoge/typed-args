@@ -3,9 +3,10 @@ from __future__ import annotations
 import argparse
 from typing import Optional, Sequence, TypeVar
 
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict
 
 from ._builder import _unwrap, build_parser
+from ._schema import ModelFieldsNode, schema_of
 
 M = TypeVar("M", bound=BaseModel)
 T = TypeVar("T", bound="TypedArgs")
@@ -28,12 +29,24 @@ def _fill_absent_models(tree: dict, model: type[BaseModel]) -> dict:
     model field (e.g. ``common``) that received no flags is then absent and would
     be treated as required. Fill it with ``{}`` so pydantic builds it from the
     sub-model's own field defaults."""
-    fields_node = TypeAdapter(model).core_schema["schema"]
+    fields_node: ModelFieldsNode = schema_of(model)
     for name in model.model_fields:
         node, _ = _unwrap(fields_node["fields"][name]["schema"])
         if node["type"] == "model" and name not in tree:
             tree[name] = {}
     return tree
+
+
+def from_namespace(model: type[M], ns: argparse.Namespace) -> M:
+    """Build a model instance from an already-parsed argparse Namespace.
+
+    Use to extract a library's Args out of a host parser's namespace, after
+    merging the Args with :func:`add_arguments` and parsing once yourself.
+    The model's dotted dests are picked out; unrelated dests on the host parser
+    are ignored (pydantic ``extra=ignore``).
+    """
+    tree = _fill_absent_models(_ns_to_tree(ns), model)
+    return model.model_validate(tree)
 
 
 def parse(
@@ -44,8 +57,7 @@ def parse(
 ) -> M:
     p = build_parser(model, parser=parser)
     ns = p.parse_args(argv)
-    tree = _fill_absent_models(_ns_to_tree(ns), model)
-    return model.model_validate(tree)
+    return from_namespace(model, ns)
 
 
 def parse_known_args(
@@ -56,8 +68,20 @@ def parse_known_args(
 ) -> tuple[M, list[str]]:
     p = build_parser(model, parser=parser)
     ns, unknown = p.parse_known_args(argv)
-    tree = _fill_absent_models(_ns_to_tree(ns), model)
-    return model.model_validate(tree), unknown
+    return from_namespace(model, ns), unknown
+
+
+def add_arguments(
+    parser: argparse.ArgumentParser, model: type[BaseModel]
+) -> argparse.ArgumentParser:
+    """Merge a model's arguments into an existing argparse parser (in place).
+
+    Lets a library export an Args definition that a host app folds into its own
+    parser. Parse once, then extract the Args instance with :func:`from_namespace`.
+
+    Returns the same parser (for chaining).
+    """
+    return build_parser(model, parser=parser)
 
 
 class TypedArgs(BaseModel):

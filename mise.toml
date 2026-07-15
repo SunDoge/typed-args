@@ -1,3 +1,2 @@
 [tools]
 ruff = "latest"
-ty = "latest"
