@@ -26,7 +26,7 @@ class RemoveArgs(ta.TypedArgs):
 
 
 class Root(ta.TypedArgs):
-    model_config = ta.TypedArgsConfig(prog="gitlike", description="add/remove demo")
+    model_config = ta.ParserConfig(prog="gitlike", description="add/remove demo")
     common: GlobalArgs
     subcommand: Annotated[Union[AddArgs, RemoveArgs], Field(discriminator="cmd")]
 

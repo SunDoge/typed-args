@@ -7,7 +7,7 @@ from pydantic import Field
 
 
 class Args(ta.TypedArgs):
-    model_config = ta.TypedArgsConfig(description="Process some integers.")
+    model_config = ta.ParserConfig(description="Process some integers.")
     integers: Annotated[
         List[int], ta.Arg(metavar="N", nargs="+", help="an integer for the accumulator")
     ]

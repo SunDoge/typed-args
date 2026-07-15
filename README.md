@@ -22,7 +22,7 @@ from pydantic import Field
 
 
 class Args(ta.TypedArgs):
-    model_config = ta.TypedArgsConfig(description="Process some integers.")
+    model_config = ta.ParserConfig(description="Process some integers.")
     integers: Annotated[List[int], ta.Arg(metavar="N", nargs="+", help="an integer for the accumulator")]
     workers: Annotated[int, Field(gt=0, le=32), ta.Arg("-w", "--workers", help="worker count")] = 4
 
@@ -55,7 +55,7 @@ raises a `pydantic.ValidationError` instead of silently producing a bad value.
   default). Precedence: `Arg(help=...)` > `Field(description=...)` > attribute docstring.
 - **Validation is real.** `pydantic` coerces and validates the parsed namespace, so
   `Field(...)`, `field_validator`, and structured error messages all work.
-- **Parser config is `model_config`.** Use `TypedArgsConfig(prog=..., description=...)`,
+- **Parser config is `model_config`.** Use `ParserConfig(prog=..., description=...)`,
   which subclasses pydantic's `ConfigDict` and mixes freely with pydantic config
   (`frozen`, `str_strip_whitespace`, ...). For full control, pass your own
   `argparse.ArgumentParser` via `Args.parse_args(parser=...)`.
@@ -110,7 +110,7 @@ Global flags (the `common` field) work both before and after the subcommand.
 
 - `TypedArgs` — `pydantic.BaseModel` subclass adding `parse_args(argv=None, *, parser=None)`
   and `parse_known_args(...)` classmethods.
-- `TypedArgsConfig` — `ConfigDict` subclass with `argparse.ArgumentParser` fields.
+- `ParserConfig` — `ConfigDict` subclass with `argparse.ArgumentParser` fields.
 - `Arg(*option_strings, **kwargs)` — argparse passthrough marker for a field.
 - `parse(model, argv=None, *, parser=None)` / `parse_known_args(...)` — free functions
   for users who don't subclass `TypedArgs`.

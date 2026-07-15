@@ -8,7 +8,7 @@ import typed_args as ta
 
 def test_prog_and_description_from_config(capsys):
     class Args(ta.TypedArgs):
-        model_config = ta.TypedArgsConfig(prog="myprog", description="a demo cli")
+        model_config = ta.ParserConfig(prog="myprog", description="a demo cli")
 
     with pytest.raises(SystemExit):
         Args.parse_args(["--help"])
@@ -43,7 +43,7 @@ def test_parser_passthrough_escape_hatch():
 
 def test_pydantic_config_mixes_with_parser_config():
     class Args(ta.TypedArgs):
-        model_config = ta.TypedArgsConfig(frozen=True, str_strip_whitespace=True)
+        model_config = ta.ParserConfig(frozen=True, str_strip_whitespace=True)
         name: Annotated[str, ta.Arg("--name")] = "x"
 
     a = Args.parse_args(["--name", "  hi  "])

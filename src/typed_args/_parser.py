@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, Optional, Sequence
+from typing import Optional, Sequence, TypeVar
 
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 
 from ._builder import _unwrap, build_parser
+
+M = TypeVar("M", bound=BaseModel)
+T = TypeVar("T", bound="TypedArgs")
 
 
 def _ns_to_tree(ns: argparse.Namespace) -> dict:
@@ -34,11 +37,11 @@ def _fill_absent_models(tree: dict, model: type[BaseModel]) -> dict:
 
 
 def parse(
-    model: type[BaseModel],
+    model: type[M],
     argv: Optional[Sequence[str]] = None,
     *,
     parser: Optional[argparse.ArgumentParser] = None,
-) -> Any:
+) -> M:
     p = build_parser(model, parser=parser)
     ns = p.parse_args(argv)
     tree = _fill_absent_models(_ns_to_tree(ns), model)
@@ -46,11 +49,11 @@ def parse(
 
 
 def parse_known_args(
-    model: type[BaseModel],
+    model: type[M],
     argv: Optional[Sequence[str]] = None,
     *,
     parser: Optional[argparse.ArgumentParser] = None,
-):
+) -> tuple[M, list[str]]:
     p = build_parser(model, parser=parser)
     ns, unknown = p.parse_known_args(argv)
     tree = _fill_absent_models(_ns_to_tree(ns), model)
@@ -60,7 +63,7 @@ def parse_known_args(
 class TypedArgs(BaseModel):
     """Base class adding ``parse_args`` / ``parse_known_args`` classmethods.
 
-    Parser config lives in ``model_config`` via :class:`TypedArgsConfig`.
+    Parser config lives in ``model_config`` via :class:`ParserConfig`.
     ``use_attribute_docstrings`` defaults on, so a bare string literal after a
     field becomes its ``help`` text automatically.
     """
@@ -69,18 +72,18 @@ class TypedArgs(BaseModel):
 
     @classmethod
     def parse_args(
-        cls,
+        cls: type[T],
         argv: Optional[Sequence[str]] = None,
         *,
         parser: Optional[argparse.ArgumentParser] = None,
-    ):
+    ) -> T:
         return parse(cls, argv, parser=parser)
 
     @classmethod
     def parse_known_args(
-        cls,
+        cls: type[T],
         argv: Optional[Sequence[str]] = None,
         *,
         parser: Optional[argparse.ArgumentParser] = None,
-    ):
+    ) -> tuple[T, list[str]]:
         return parse_known_args(cls, argv, parser=parser)

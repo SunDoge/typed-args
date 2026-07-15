@@ -6,13 +6,13 @@ from typing import Optional
 from pydantic import ConfigDict
 
 
-class TypedArgsConfig(ConfigDict, total=False):
+class ParserConfig(ConfigDict, total=False):
     """Parser config that lives in ``model_config`` alongside pydantic config.
 
     Fields mirror ``argparse.ArgumentParser.__init__``. Mix freely with
     pydantic's own config keys, e.g.::
 
-        model_config = TypedArgsConfig(prog="cli", description="...", frozen=True)
+        model_config = ParserConfig(prog="cli", description="...", frozen=True)
 
     Custom keys are retained on the class and read by the builder; pydantic's
     own keys (``frozen``, ``str_strip_whitespace``, ...) still take effect.

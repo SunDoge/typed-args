@@ -28,7 +28,7 @@ _PARSER_KEYS = {
 
 
 def _parser_kwargs(model: type) -> dict:
-    cfg = getattr(model, "model_config", {}) or {}
+    cfg = getattr(model, "model_config", {})
     kw = {k: v for k, v in cfg.items() if k in _PARSER_KEYS}
     kw.setdefault("formatter_class", DefaultHelpFormatter)
     return kw
