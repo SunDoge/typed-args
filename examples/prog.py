@@ -1,31 +1,20 @@
+"""Minimal example: typed args with validation."""
+
+from typing import Annotated, List
+
 import typed_args as ta
-from typing import List, Callable
+from pydantic import Field
 
 
-@ta.argument_parser()
 class Args(ta.TypedArgs):
-    """
-    Process some integers.
-    """
-
-    integers: List[int] = ta.add_argument(
-        metavar="N",
-        type=int,
-        nargs="+",
-        # help='an integer for the accumulator'
-    )
-    """
-    an integer for the accumulator
-    """
-
-    accumulate: Callable[[List[int]], int] = ta.add_argument(
-        "--sum",
-        action="store_const",
-        const=sum,
-        default=max,
-        help="sum the integers (default: find the max)",
-    )
+    model_config = ta.TypedArgsConfig(description="Process some integers.")
+    integers: Annotated[
+        List[int], ta.Arg(metavar="N", nargs="+", help="an integer for the accumulator")
+    ]
+    workers: Annotated[
+        int, Field(gt=0, le=32), ta.Arg("-w", "--workers", help="worker count")
+    ] = 4
 
 
 args = Args.parse_args()
-print(args.accumulate(args.integers))
+print(args.integers, "max =", max(args.integers), "workers =", args.workers)

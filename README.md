@@ -1,159 +1,117 @@
 # typed-args
 
-[![Github Actions](https://img.shields.io/github/actions/workflow/status/SunDoge/typed-args/python-package.yml?branch=main&style=for-the-badge)](https://github.com/SunDoge/typed-args/actions/workflows/python-package.yml)
-[![Pypi](https://img.shields.io/pypi/v/typed-args?style=for-the-badge)](https://pypi.org/project/typed-args/)
+A typed command-line argument parser for Python, inspired by Rust's [clap](https://docs.rs/clap).
+Define a `pydantic` model — its types drive the CLI, and parsing runs real runtime
+validation. Subcommands are discriminated unions you dispatch with `match`.
 
-This project is inspired by [TeXitoi/structopt](https://github.com/TeXitoi/structopt).
-
-## Introduction
-
-`typed-args` is a Python package for creating command line interfaces with type annotations. 
-The program defines what arguments it requires, and `typed-args` will figure out how to parse them out of `sys.argv`. 
-`typed-args` use standard python library `argparse` and `dataclasses` so no need to install any dependencies after Python 3.6. 
-Its API is very similar to `argparse`. 
-
-
-What does it look like? Here is an [example](https://docs.python.org/3/library/argparse.html#example) from `argparse` docs and is rewritten with `typed-args`:
-
-```python
-import typed_args as ta
-from typing import List, Callable
-
-
-@ta.argument_parser(
-    description='Process some integers.'
-)
-class Args(ta.TypedArgs):
-    integers: List[int] = ta.add_argument(
-        metavar='N', type=int, nargs='+',
-        help='an integer for the accumulator'
-    )
-    accumulate: Callable[[List[int]], int] = ta.add_argument(
-        '--sum',
-        action='store_const',
-        const=sum, default=max,
-        help='sum the integers (default: find the max)'
-    )
-
-
-args = Args.parse_args()
-print(args.accumulate(args.integers))
-```
-
-Assuming the above Python code is saved into a file called `prog.py`, it can be run at the command line and it provides useful help messages:
-
-```text
-$ python prog.py -h
-usage: prog.py [-h] [--sum] N [N ...]
-
-Process some integers.
-
-positional arguments:
-  N           an integer for the accumulator
-
-optional arguments:
-  -h, --help  show this help message and exit
-  --sum       sum the integers (default: find the max)
-```
-
-When run with the appropriate arguments, it prints either the sum or the max of the command-line integers:
-
-```text
-$ python prog.py 1 2 3 4
-4
-
-$ python prog.py 1 2 3 4 --sum
-10
-```
-
-If invalid arguments are passed in, an error will be displayed:
-
-```text
-$ python prog.py a b c
-usage: prog.py [-h] [--sum] N [N ...]
-prog.py: error: argument N: invalid int value: 'a'
-```
-
-
+Requires Python 3.10+ and `pydantic` 2.
 
 ## Installation
-
-From pypi
 
 ```bash
 pip install typed-args
 ```
 
-If you want to use it on python 3.5 and 3.6 please install `dataclasses`:
-
-```bash
-pip install dataclasses
-```
-
-## Core Functionality
-
-Check [_test_v0_6.py](https://github.com/SunDoge/typed-args/blob/master/_test_v0_6.py) for `add_argument_group` and `add_subparsers`.
-
-
-### Create a parser
-
-`argparse`
+## A first example
 
 ```python
-import argparse
-parser = argparse.ArgumentParser(prog='ProgramName')
-```
+from typing import Annotated, List
 
-`typed-args`
-
-```python
 import typed_args as ta
+from pydantic import Field
 
-@ta.argument_parser(prog='ProgramName')
+
 class Args(ta.TypedArgs):
-    pass
-```
+    model_config = ta.TypedArgsConfig(description="Process some integers.")
+    integers: Annotated[List[int], ta.Arg(metavar="N", nargs="+", help="an integer for the accumulator")]
+    workers: Annotated[int, Field(gt=0, le=32), ta.Arg("-w", "--workers", help="worker count")] = 4
 
-### Add arguments
 
-`argparse`
-
-```python
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('filename')           # positional argument
-parser.add_argument('-c', '--count')      # option that takes a value
-parser.add_argument('-v', '--verbose',
-                    action='store_true')  # on/off flag
-```
-
-`typed-args`
-
-```python
-import typed_args as ta
-
-@ta.argument_parser()
-class Args(ta.TypedArgs):
-    filename: str = ta.add_argument()                    # positional argument, use the attribute name automatically
-    count: str = ta.add_argument('-c', '--count')        # option that takes a value, also can be annotated as Optional[str]
-    verbose: bool = ta.add_argument('-v', '--verbose', 
-                                    action='store_true') # on/off flag
-```
-
-### Parse args
-
-`argparse`
-
-```python
-args = parser.parse_args()
-print(args.filename, args.count, args.verbose)
-```
-
-`typed-args`
-
-```python
 args = Args.parse_args()
-print(args.filename, args.count, args.verbose)
+print(args.integers, "max =", max(args.integers), "workers =", args.workers)
 ```
 
+```text
+$ python prog.py 1 2 3 4 -w 8
+[1, 2, 3, 4] max = 4 workers = 8
 
+$ python prog.py 1 -w 99
+workers
+  Input should be less than or equal to 32 ...
+```
+
+The `Field(gt=0, le=32)` constraint is enforced at parse time — `workers=99`
+raises a `pydantic.ValidationError` instead of silently producing a bad value.
+
+## How it works
+
+- **Types drive structure.** `bool` → `--flag` (store_true), `Literal[...]` → `choices`,
+  `list` → `nargs`, `Optional`/defaults → optional args, required scalars → positionals.
+- **`Arg(...)` is the argparse passthrough.** Attach it via `Annotated[T, Arg(...)]` for
+  option strings, `help`, `metavar`, `action`, `nargs`, `const`, ... It overlays
+  argparse params on top of the type-derived defaults.
+- **Docstrings become `help` automatically.** A bare string literal on the line after a
+  field is used as its `help` text (via pydantic's `use_attribute_docstrings`, on by
+  default). Precedence: `Arg(help=...)` > `Field(description=...)` > attribute docstring.
+- **Validation is real.** `pydantic` coerces and validates the parsed namespace, so
+  `Field(...)`, `field_validator`, and structured error messages all work.
+- **Parser config is `model_config`.** Use `TypedArgsConfig(prog=..., description=...)`,
+  which subclasses pydantic's `ConfigDict` and mixes freely with pydantic config
+  (`frozen`, `str_strip_whitespace`, ...). For full control, pass your own
+  `argparse.ArgumentParser` via `Args.parse_args(parser=...)`.
+
+## Subcommands
+
+Subcommands are a pydantic discriminated union; dispatch with `match`:
+
+```python
+from typing import Annotated, Literal, Union
+
+import typed_args as ta
+from pydantic import Field
+
+
+class GlobalArgs(ta.TypedArgs):
+    verbose: Annotated[bool, ta.Arg("-v", "--verbose")] = False
+
+
+class AddArgs(ta.TypedArgs):
+    cmd: Literal["add"] = "add"
+    file: Annotated[str, ta.Arg(help="file to add")]
+    force: Annotated[bool, ta.Arg("--force")] = False
+
+
+class RemoveArgs(ta.TypedArgs):
+    cmd: Literal["remove"] = "remove"
+    file: Annotated[str, ta.Arg(help="file to remove")]
+    recursive: Annotated[bool, ta.Arg("-r", "--recursive")] = False
+
+
+class Root(ta.TypedArgs):
+    common: GlobalArgs
+    subcommand: Annotated[Union[AddArgs, RemoveArgs], Field(discriminator="cmd")]
+
+
+root = Root.parse_args()
+match root.subcommand:
+    case AddArgs(file=f, force=True):
+        print("force-add", f)
+    case AddArgs(file=f):
+        print("add", f)
+    case RemoveArgs(file=f, recursive=True):
+        print("recursive remove", f)
+    case RemoveArgs(file=f):
+        print("remove", f)
+```
+
+Global flags (the `common` field) work both before and after the subcommand.
+
+## API
+
+- `TypedArgs` — `pydantic.BaseModel` subclass adding `parse_args(argv=None, *, parser=None)`
+  and `parse_known_args(...)` classmethods.
+- `TypedArgsConfig` — `ConfigDict` subclass with `argparse.ArgumentParser` fields.
+- `Arg(*option_strings, **kwargs)` — argparse passthrough marker for a field.
+- `parse(model, argv=None, *, parser=None)` / `parse_known_args(...)` — free functions
+  for users who don't subclass `TypedArgs`.
+- `DefaultHelpFormatter` — strips dotted dest prefixes from help output.
