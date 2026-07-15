@@ -1,5 +1,10 @@
 # typed-args
 
+[![PyPI version](https://img.shields.io/pypi/v/typed-args.svg)](https://pypi.org/project/typed-args/)
+[![Python versions](https://img.shields.io/pypi/pyversions/typed-args.svg)](https://pypi.org/project/typed-args/)
+[![Python package](https://github.com/SunDoge/typed-args/actions/workflows/python-package.yml/badge.svg)](https://github.com/SunDoge/typed-args/actions/workflows/python-package.yml)
+[![Publish](https://github.com/SunDoge/typed-args/actions/workflows/python-publish.yml/badge.svg)](https://github.com/SunDoge/typed-args/actions/workflows/python-publish.yml)
+
 A typed command-line argument parser for Python, inspired by Rust's [clap](https://docs.rs/clap).
 Define a `pydantic` model — its types drive the CLI, and parsing runs real runtime
 validation. Subcommands are discriminated unions you dispatch with `match`.
