@@ -64,3 +64,13 @@ def test_optional_type_optional():
 
     assert Args.parse_args([]).opt is None
     assert Args.parse_args(["--opt", "v"]).opt == "v"
+
+
+def test_dest_override_rejected():
+    class Args(ta.TypedArgs):
+        foo: Annotated[str, ta.Arg("-f", "--foo", dest="custom_dest")] = "x"
+
+    # dest is derived from the field path (the link to the model); overriding it is
+    # rejected with a clear error rather than silently desyncing the namespace.
+    with pytest.raises(ValueError, match="dest"):
+        Args.parse_args(["-f", "v"])

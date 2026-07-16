@@ -1,4 +1,4 @@
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal, Optional, Union
 
 import pytest
 from pydantic import Field
@@ -55,12 +55,45 @@ def test_global_before_subcommand(Root):
     assert r.subcommand.force is True
 
 
-def test_global_after_subcommand(Root):
-    r = Root.parse_args(["add", "x.txt", "--config", "c.yml", "-v"])
-    assert r.common.config == "c.yml"
-    assert r.common.verbose is True
+def test_global_after_subcommand_rejected(Root):
+    # globals must precede the subcommand (argparse behavior); flags after the
+    # subcommand are not recognized.
+    with pytest.raises(SystemExit):
+        Root.parse_args(["add", "x.txt", "--config", "c.yml", "-v"])
 
 
 def test_bad_subcommand_exits(Root):
     with pytest.raises(SystemExit):
         Root.parse_args(["bogus", "x"])
+
+
+def test_optional_subcommand():
+    class Add(ta.TypedArgs):
+        cmd: Literal["add"] = "add"
+        file: Annotated[str, ta.Arg()]
+
+    class Root(ta.TypedArgs):
+        subcommand: Optional[Annotated[Union[Add, Add], Field(discriminator="cmd")]] = None
+
+    assert Root.parse_args([]).subcommand is None
+    r = Root.parse_args(["add", "x"])
+    assert isinstance(r.subcommand, Add) and r.subcommand.file == "x"
+
+
+def test_subparsers_section_in_help(capsys):
+    class Add(ta.TypedArgs):
+        cmd: Literal["add"] = "add"
+        file: Annotated[str, ta.Arg()]
+
+    class Root(ta.TypedArgs):
+        subcommand: Annotated[
+            Union[Add, Add],
+            Field(discriminator="cmd"),
+            ta.Subparsers(title="Commands", description="pick one"),
+        ] = None
+
+    with pytest.raises(SystemExit):
+        Root.parse_args(["--help"])
+    out = capsys.readouterr().out
+    assert "Commands" in out
+    assert "pick one" in out

@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import argparse
-from typing import Any, cast
+from typing import Any, TypeVar, cast
 
-from ._arg import Arg
+from ._arg import Arg, Group, Mutex, Subparsers
 from ._formatter import DefaultHelpFormatter
 from ._schema import (
     DefaultNode,
     FieldEntry,
     ModelFieldsNode,
-    ModelNode,
     Node,
     NullableNode,
     TaggedUnionNode,
@@ -17,6 +16,7 @@ from ._schema import (
 )
 
 _UNSET = object()
+M = TypeVar("M")
 
 # argparse.ArgumentParser.__init__ params we honor from model_config.
 _PARSER_KEYS = {
@@ -42,9 +42,9 @@ def _parser_kwargs(model: type) -> dict:
     return kw
 
 
-def _get_arg(fi) -> Arg | None:
+def _get_marker(fi, cls: type[M]) -> M | None:
     for m in fi.metadata:
-        if isinstance(m, Arg):
+        if isinstance(m, cls):
             return m
     return None
 
@@ -72,18 +72,20 @@ def _opt_strings(name: str, arg: Arg | None) -> tuple[str, ...]:
     return (f"--{name.replace('_', '-')}",)
 
 
-def _add(parser, name, dest, default, arg, *, extra=None, suppress=False, help=None):
+def _add(parser, name, dest, default, arg, *, extra=None, help=None):
     """Add one argument, merging Arg.kwargs over type-derived defaults.
 
-    ``suppress`` forces ``default=argparse.SUPPRESS`` so an absent flag does not
-    write the dest — used for globals shared across main + subparsers to avoid the
-    argparse subparser default-clobber; pydantic's model default fills the gap.
     ``help`` is the fallback help text (Field description or attribute docstring);
     an explicit ``Arg(help=...)`` in ``arg.kwargs`` always wins.
     """
     kw = dict(extra) if extra else {}
     if arg:
         kw.update(arg.kwargs)
+    if "dest" in kw:
+        raise ValueError(
+            "Arg(dest=...) is not supported: dest is derived from the field path "
+            "(the link to the model field). Rename the field or use option strings."
+        )
     if "help" not in kw and help:
         kw["help"] = help
     positional = (not arg or not arg.option_strings) and default is _UNSET
@@ -92,64 +94,54 @@ def _add(parser, name, dest, default, arg, *, extra=None, suppress=False, help=N
         kw.setdefault("default", None)
         parser.add_argument(dest=dest, **kw)
     else:
-        if suppress:
-            kw["default"] = argparse.SUPPRESS
-        elif default is not _UNSET:
+        if default is not _UNSET:
             kw.setdefault("default", default)
         parser.add_argument(*_opt_strings(name, arg), dest=dest, **kw)
 
 
-def _emit(
-    parser, model_cls, name, node: Node, default, arg, dest, suppress=False, help=None
-) -> None:
+def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
     if node["type"] == "tagged-union":
-        _emit_subcommand(parser, node, dest)
+        _emit_subcommand(
+            parser, node, dest,
+            required=(default is _UNSET),
+            subparsers=_get_marker(fi, Subparsers),
+        )
         return
     if node["type"] == "model":
-        _add_fields(parser, node["cls"], prefix=f"{dest}.", suppress=suppress)
+        group = _get_marker(fi, Group)
+        mutex = _get_marker(fi, Mutex)
+        if group:
+            target = parser.add_argument_group(group.title, group.description)
+        elif mutex:
+            target = parser.add_mutually_exclusive_group(required=mutex.required)
+        else:
+            target = parser
+        _add_fields(target, node["cls"], prefix=f"{dest}.")
         return
+    arg = _get_marker(fi, Arg)
+    help = fi.description
     if node["type"] == "bool":
         if arg and "action" in arg.kwargs:
-            _add(parser, name, dest, default, arg, suppress=suppress, help=help)
+            _add(parser, name, dest, default, arg, help=help)
         else:
             d = False if default is _UNSET else bool(default)
-            _add(
-                parser,
-                name,
-                dest,
-                d,
-                arg,
-                extra={"action": "store_true"},
-                suppress=suppress,
-                help=help,
-            )
+            _add(parser, name, dest, d, arg, extra={"action": "store_true"}, help=help)
         return
     if node["type"] == "literal":
-        _add(
-            parser,
-            name,
-            dest,
-            default,
-            arg,
-            extra={"choices": node["expected"]},
-            suppress=suppress,
-            help=help,
-        )
+        _add(parser, name, dest, default, arg, extra={"choices": node["expected"]}, help=help)
         return
     if node["type"] == "list":
         extra: dict = {}
         if not (arg and ("action" in arg.kwargs or "nargs" in arg.kwargs)):
             extra["nargs"] = "*"
-        _add(
-            parser, name, dest, default, arg, extra=extra, suppress=suppress, help=help
-        )
+        _add(parser, name, dest, default, arg, extra=extra, help=help)
         return
     # str / int / float / other scalars — pydantic coerces & validates
-    _add(parser, name, dest, default, arg, suppress=suppress, help=help)
+    _add(parser, name, dest, default, arg, help=help)
 
 
 def _add_fields(
-    parser, model_cls: type, prefix: str, skip: tuple[str, ...] = (), suppress=False
+    parser, model_cls: type, prefix: str, skip: tuple[str, ...] = ()
 ) -> None:
     fields_node: ModelFieldsNode = schema_of(model_cls)
     for name, fi in model_cls.model_fields.items():
@@ -157,84 +149,50 @@ def _add_fields(
             continue
         entry: FieldEntry = fields_node["fields"][name]
         node, default = _unwrap(entry["schema"])
-        # fi.description holds Field(description=...) OR, when use_attribute_docstrings
-        # is on, the attribute docstring (Field wins). Arg(help=...) overrides both.
-        help = fi.description
-        _emit(
-            parser,
-            model_cls,
-            name,
-            node,
-            default,
-            _get_arg(fi),
-            dest=prefix + name,
-            suppress=suppress,
-            help=help,
-        )
+        _emit(parser, model_cls, name, node, default, fi, dest=prefix + name)
 
 
-def _emit_subcommand(parser, node: TaggedUnionNode, dest, parents=()) -> None:
+def _emit_subcommand(
+    parser, node: TaggedUnionNode, dest, *, required: bool = True,
+    subparsers: Subparsers | None = None,
+) -> None:
     tag = node["discriminator"]
-    subs = parser.add_subparsers(dest=f"{dest}.{tag}", required=True)
+    kw: dict = {}
+    if subparsers:
+        for k in ("title", "description", "prog", "metavar"):
+            v = getattr(subparsers, k)
+            if v is not None:
+                kw[k] = v
+    subs = parser.add_subparsers(dest=f"{dest}.{tag}", required=required, **kw)
     for tagval, vnode in node["choices"].items():
-        sp = subs.add_parser(
-            tagval, parents=list(parents), formatter_class=DefaultHelpFormatter
-        )
+        sp = subs.add_parser(tagval)
         _add_fields(sp, vnode["cls"], prefix=f"{dest}.", skip=(tag,))
 
 
-def _root_globals_parent(model: type) -> argparse.ArgumentParser | None:
-    """Root nested-model fields (e.g. `common`) become a shared parent parser
-    so they work both before and after the subcommand."""
+def _resolve_optional_subcommands(tree: dict, model: type) -> dict:
+    """For an optional subcommand (Optional[discriminated union] with a default),
+    argparse writes the discriminator dest as None when no subcommand is chosen;
+    collapse that subtree to None so the field takes its model default."""
     fields_node: ModelFieldsNode = schema_of(model)
-    parent = None
-    for name, fi in model.model_fields.items():
-        node, _ = _unwrap(fields_node["fields"][name]["schema"])
-        if node["type"] == "model":
-            if parent is None:
-                parent = argparse.ArgumentParser(
-                    add_help=False, formatter_class=DefaultHelpFormatter
-                )
-            _add_fields(parent, node["cls"], prefix=f"{name}.", suppress=True)
-    return parent
+    for name in model.model_fields:
+        entry: FieldEntry = fields_node["fields"][name]
+        node, default = _unwrap(entry["schema"])
+        if node["type"] == "tagged-union" and default is not _UNSET:
+            tu = cast(TaggedUnionNode, node)
+            sub = tree.get(name)
+            if isinstance(sub, dict) and sub.get(tu["discriminator"]) is None:
+                tree[name] = None
+    return tree
 
 
 def build_parser(
     model: type, parser: argparse.ArgumentParser | None = None
 ) -> argparse.ArgumentParser:
-    globals_parent = _root_globals_parent(model)
-
     if parser is None:
-        kw = _parser_kwargs(model)
-        if globals_parent is not None:
-            kw.setdefault("parents", []).append(globals_parent)
-        parser = argparse.ArgumentParser(**kw)
-    elif globals_parent is not None:
-        # user-supplied parser: add globals directly (before-subcommand support)
-        fields_node: ModelFieldsNode = schema_of(model)
-        for name, fi in model.model_fields.items():
-            node, _ = _unwrap(fields_node["fields"][name]["schema"])
-            if node["type"] == "model":
-                _add_fields(parser, node["cls"], prefix=f"{name}.", suppress=True)
-
-    fields_node = schema_of(model)
+        parser = argparse.ArgumentParser(**_parser_kwargs(model))
+    fields_node: ModelFieldsNode = schema_of(model)
     for name, fi in model.model_fields.items():
-        node, default = _unwrap(fields_node["fields"][name]["schema"])
-        if node["type"] == "model":
-            continue  # handled via globals_parent / direct add above
-        if node["type"] == "tagged-union":
-            parents = [globals_parent] if globals_parent else []
-            _emit_subcommand(parser, node, name, parents=parents)
-            continue
-        _emit(
-            parser,
-            model,
-            name,
-            node,
-            default,
-            _get_arg(fi),
-            dest=name,
-            help=fi.description,
-        )
-
+        entry: FieldEntry = fields_node["fields"][name]
+        node, default = _unwrap(entry["schema"])
+        _emit(parser, model, name, node, default, fi, dest=name)
     return parser

@@ -5,8 +5,7 @@ from typing import Optional, Sequence, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 
-from ._builder import _unwrap, build_parser
-from ._schema import ModelFieldsNode, schema_of
+from ._builder import _resolve_optional_subcommands, build_parser
 
 M = TypeVar("M", bound=BaseModel)
 T = TypeVar("T", bound="TypedArgs")
@@ -24,19 +23,6 @@ def _ns_to_tree(ns: argparse.Namespace) -> dict:
     return tree
 
 
-def _fill_absent_models(tree: dict, model: type[BaseModel]) -> dict:
-    """Globals use ``default=SUPPRESS`` so absent flags write nothing. A nested
-    model field (e.g. ``common``) that received no flags is then absent and would
-    be treated as required. Fill it with ``{}`` so pydantic builds it from the
-    sub-model's own field defaults."""
-    fields_node: ModelFieldsNode = schema_of(model)
-    for name in model.model_fields:
-        node, _ = _unwrap(fields_node["fields"][name]["schema"])
-        if node["type"] == "model" and name not in tree:
-            tree[name] = {}
-    return tree
-
-
 def from_namespace(model: type[M], ns: argparse.Namespace) -> M:
     """Build a model instance from an already-parsed argparse Namespace.
 
@@ -45,7 +31,7 @@ def from_namespace(model: type[M], ns: argparse.Namespace) -> M:
     The model's dotted dests are picked out; unrelated dests on the host parser
     are ignored (pydantic ``extra=ignore``).
     """
-    tree = _fill_absent_models(_ns_to_tree(ns), model)
+    tree = _resolve_optional_subcommands(_ns_to_tree(ns), model)
     return model.model_validate(tree)
 
 
