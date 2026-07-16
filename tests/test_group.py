@@ -1,4 +1,5 @@
 """Argument groups via the Group marker (display-only sectioning)."""
+
 from typing import Annotated
 
 import typed_args as ta

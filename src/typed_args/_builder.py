@@ -102,7 +102,9 @@ def _add(parser, name, dest, default, arg, *, extra=None, help=None):
 def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
     if node["type"] == "tagged-union":
         _emit_subcommand(
-            parser, node, dest,
+            parser,
+            node,
+            dest,
             required=(default is _UNSET),
             subparsers=_get_marker(fi, Subparsers),
         )
@@ -128,7 +130,15 @@ def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
             _add(parser, name, dest, d, arg, extra={"action": "store_true"}, help=help)
         return
     if node["type"] == "literal":
-        _add(parser, name, dest, default, arg, extra={"choices": node["expected"]}, help=help)
+        _add(
+            parser,
+            name,
+            dest,
+            default,
+            arg,
+            extra={"choices": node["expected"]},
+            help=help,
+        )
         return
     if node["type"] == "list":
         extra: dict = {}
@@ -153,7 +163,11 @@ def _add_fields(
 
 
 def _emit_subcommand(
-    parser, node: TaggedUnionNode, dest, *, required: bool = True,
+    parser,
+    node: TaggedUnionNode,
+    dest,
+    *,
+    required: bool = True,
     subparsers: Subparsers | None = None,
 ) -> None:
     tag = node["discriminator"]

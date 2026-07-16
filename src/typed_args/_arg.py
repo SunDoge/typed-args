@@ -72,7 +72,9 @@ class Group:
 
     __slots__ = ("title", "description")
 
-    def __init__(self, title: str | None = None, description: str | None = None) -> None:
+    def __init__(
+        self, title: str | None = None, description: str | None = None
+    ) -> None:
         self.title = title
         self.description = description
 

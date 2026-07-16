@@ -124,42 +124,41 @@ after-subcommand globals are not supported.
 
 ## Feature support
 
-| Feature | Status | How / note |
-|---|:--:|---|
-| **Args** | | |
-| Positional / optional | ✓ | `Arg()` / `Arg("-f", "--foo")` |
-| `action` (store_true / store_const / append / count / custom) | ✓ | auto for `bool`; `Arg(action=...)` |
-| `nargs` | ✓ | auto `*` for `list`; `Arg(nargs=...)` |
-| `const` / `default` / `type` / `choices` / `required` / `help` / `metavar` | ✓ | `Arg(...)` passthrough |
-| Custom `Action` | ✓ | via `Arg(**kwargs)` |
-| `dest` override | ✗ | rejected — `dest` is the field-path link to the model |
-| **Types & validation** | | |
-| Type-driven structure (`bool`→flag, `Literal`→choices, `list`→nargs, required→positional) | ✓ | |
-| `Field` constraints (`gt`/`le`/…), `field_validator`, `ValidationError` | ✓ | pydantic at parse time |
-| **Help** | | |
-| Attribute docstring → `help` | ✓ | `use_attribute_docstrings`, on by default |
-| `help` precedence: `Arg(help=)` > `Field(description=)` > docstring | ✓ | |
-| `DefaultHelpFormatter` (strips dotted dest) | ✓ | |
-| **Parser config** | | |
-| `prog` / `description` / `epilog` / `prefix_chars` / `fromfile_prefix_chars` / `argument_default` / `conflict_handler` / `add_help` / `allow_abbrev` / `exit_on_error` / `formatter_class` | ✓ | `ParserConfig` in `model_config` |
-| Custom `ArgumentParser` (escape hatch) | ✓ | `parse_args(parser=...)` |
-| **Subcommands** | | |
-| Discriminated union + `match` dispatch | ✓ | |
-| Optional subcommand (`required=False`) | ✓ | `Optional[Union[...]] = None` |
-| Nested subcommands | ✓ | recursive |
-| Subparsers section `title` / `description` / `prog` / `metavar` | ✓ | `Subparsers(...)` marker |
-| Subcommand aliases (`add_parser(aliases=...)`) | ✗ | not implemented |
-| Per-subparser config (`prog` / `description` / `formatter_class` / `help`) | ✗ | not implemented |
-| **Groups** | | |
-| Argument group (titled section) | ✓ | `Group(...)` marker |
-| Mutually exclusive group | ✓ | `Mutex(...)` marker |
-| **Composition** | | |
-| Nested model as a field (library args as an attribute) | ✓ | |
-| Merge into a host `argparse` parser | ✓ | `add_arguments` / `from_namespace` |
-| Global args before the subcommand | ✓ | nested model on the main parser |
-| Global args after the subcommand (clap `global=true`) | ✗ | cut — put globals before the subcommand |
-| Prefixing a nested model's flags (`--lib-host`) | ✗ | decided against |
-| **Parsing** | | |
-| `parse_args` / `parse_known_args` | ✓ | |
-| `parse_intermixed_args` | ✗ | not exposed |
-
+| Feature                                                                                                                                                                                    | Status | How / note                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | ----------------------------------------------------- |
+| **Args**                                                                                                                                                                                   |        |                                                       |
+| Positional / optional                                                                                                                                                                      |   ✓    | `Arg()` / `Arg("-f", "--foo")`                        |
+| `action` (store_true / store_const / append / count / custom)                                                                                                                              |   ✓    | auto for `bool`; `Arg(action=...)`                    |
+| `nargs`                                                                                                                                                                                    |   ✓    | auto `*` for `list`; `Arg(nargs=...)`                 |
+| `const` / `default` / `type` / `choices` / `required` / `help` / `metavar`                                                                                                                 |   ✓    | `Arg(...)` passthrough                                |
+| Custom `Action`                                                                                                                                                                            |   ✓    | via `Arg(**kwargs)`                                   |
+| `dest` override                                                                                                                                                                            |   ✗    | rejected — `dest` is the field-path link to the model |
+| **Types & validation**                                                                                                                                                                     |        |                                                       |
+| Type-driven structure (`bool`→flag, `Literal`→choices, `list`→nargs, required→positional)                                                                                                  |   ✓    |                                                       |
+| `Field` constraints (`gt`/`le`/…), `field_validator`, `ValidationError`                                                                                                                    |   ✓    | pydantic at parse time                                |
+| **Help**                                                                                                                                                                                   |        |                                                       |
+| Attribute docstring → `help`                                                                                                                                                               |   ✓    | `use_attribute_docstrings`, on by default             |
+| `help` precedence: `Arg(help=)` > `Field(description=)` > docstring                                                                                                                        |   ✓    |                                                       |
+| `DefaultHelpFormatter` (strips dotted dest)                                                                                                                                                |   ✓    |                                                       |
+| **Parser config**                                                                                                                                                                          |        |                                                       |
+| `prog` / `description` / `epilog` / `prefix_chars` / `fromfile_prefix_chars` / `argument_default` / `conflict_handler` / `add_help` / `allow_abbrev` / `exit_on_error` / `formatter_class` |   ✓    | `ParserConfig` in `model_config`                      |
+| Custom `ArgumentParser` (escape hatch)                                                                                                                                                     |   ✓    | `parse_args(parser=...)`                              |
+| **Subcommands**                                                                                                                                                                            |        |                                                       |
+| Discriminated union + `match` dispatch                                                                                                                                                     |   ✓    |                                                       |
+| Optional subcommand (`required=False`)                                                                                                                                                     |   ✓    | `Optional[Union[...]] = None`                         |
+| Nested subcommands                                                                                                                                                                         |   ✓    | recursive                                             |
+| Subparsers section `title` / `description` / `prog` / `metavar`                                                                                                                            |   ✓    | `Subparsers(...)` marker                              |
+| Subcommand aliases (`add_parser(aliases=...)`)                                                                                                                                             |   ✗    | not implemented                                       |
+| Per-subparser config (`prog` / `description` / `formatter_class` / `help`)                                                                                                                 |   ✗    | not implemented                                       |
+| **Groups**                                                                                                                                                                                 |        |                                                       |
+| Argument group (titled section)                                                                                                                                                            |   ✓    | `Group(...)` marker                                   |
+| Mutually exclusive group                                                                                                                                                                   |   ✓    | `Mutex(...)` marker                                   |
+| **Composition**                                                                                                                                                                            |        |                                                       |
+| Nested model as a field (library args as an attribute)                                                                                                                                     |   ✓    |                                                       |
+| Merge into a host `argparse` parser                                                                                                                                                        |   ✓    | `add_arguments` / `from_namespace`                    |
+| Global args before the subcommand                                                                                                                                                          |   ✓    | nested model on the main parser                       |
+| Global args after the subcommand (clap `global=true`)                                                                                                                                      |   ✗    | cut — put globals before the subcommand               |
+| Prefixing a nested model's flags (`--lib-host`)                                                                                                                                            |   ✗    | decided against                                       |
+| **Parsing**                                                                                                                                                                                |        |                                                       |
+| `parse_args` / `parse_known_args`                                                                                                                                                          |   ✓    |                                                       |
+| `parse_intermixed_args`                                                                                                                                                                    |   ✗    | not exposed                                           |

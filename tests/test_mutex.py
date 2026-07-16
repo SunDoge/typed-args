@@ -1,4 +1,5 @@
 """Mutually exclusive groups via the Mutex marker."""
+
 from typing import Annotated
 
 import pytest

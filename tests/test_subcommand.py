@@ -73,7 +73,9 @@ def test_optional_subcommand():
         file: Annotated[str, ta.Arg()]
 
     class Root(ta.TypedArgs):
-        subcommand: Optional[Annotated[Union[Add, Add], Field(discriminator="cmd")]] = None
+        subcommand: Optional[Annotated[Union[Add, Add], Field(discriminator="cmd")]] = (
+            None
+        )
 
     assert Root.parse_args([]).subcommand is None
     r = Root.parse_args(["add", "x"])
