@@ -4,10 +4,11 @@ version = "0.8.0"
 description = "Parse command line arguments by defining pydantic models"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [{ name = "SunDoge", email = "triplez0@outlook.com" }]
 keywords = ["argparse", "clap", "cli", "pydantic"]
 classifiers = [
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
@@ -21,7 +22,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "pytest>=7.0.1",
+  "pytest>=9.1.1",
   "ty>=0.0.68",
 ]
 
