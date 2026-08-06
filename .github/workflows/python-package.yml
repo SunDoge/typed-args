@@ -28,5 +28,8 @@ jobs:
       - name: Set up Python
         run: uv python install ${{ matrix.python-version }}
 
+      - name: Type check with ty
+        run: uv run --frozen ty check
+
       - name: Test with pytest
         run: uv run --frozen pytest

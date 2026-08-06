@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 from typing import Any, TypeVar, cast
+
+from pydantic import BaseModel
 
 from ._arg import Arg, Group, Mutex, Subparsers
 from ._formatter import DefaultHelpFormatter
 from ._schema import (
     DefaultNode,
     FieldEntry,
+    LiteralNode,
     ModelFieldsNode,
+    ModelNode,
     Node,
     NullableNode,
     TaggedUnionNode,
@@ -101,15 +106,17 @@ def _add(parser, name, dest, default, arg, *, extra=None, help=None):
 
 def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
     if node["type"] == "tagged-union":
+        tagged = cast(TaggedUnionNode, node)
         _emit_subcommand(
             parser,
-            node,
+            tagged,
             dest,
             required=(default is _UNSET),
             subparsers=_get_marker(fi, Subparsers),
         )
         return
     if node["type"] == "model":
+        model = cast(ModelNode, node)
         group = _get_marker(fi, Group)
         mutex = _get_marker(fi, Mutex)
         if group:
@@ -118,7 +125,7 @@ def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
             target = parser.add_mutually_exclusive_group(required=mutex.required)
         else:
             target = parser
-        _add_fields(target, node["cls"], prefix=f"{dest}.")
+        _add_fields(target, model["cls"], prefix=f"{dest}.")
         return
     arg = _get_marker(fi, Arg)
     help = fi.description
@@ -130,13 +137,14 @@ def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
             _add(parser, name, dest, d, arg, extra={"action": "store_true"}, help=help)
         return
     if node["type"] == "literal":
+        literal = cast(LiteralNode, node)
         _add(
             parser,
             name,
             dest,
             default,
             arg,
-            extra={"choices": node["expected"]},
+            extra={"choices": literal["expected"]},
             help=help,
         )
         return
@@ -151,7 +159,7 @@ def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
 
 
 def _add_fields(
-    parser, model_cls: type, prefix: str, skip: tuple[str, ...] = ()
+    parser, model_cls: type[BaseModel], prefix: str, skip: tuple[str, ...] = ()
 ) -> None:
     fields_node: ModelFieldsNode = schema_of(model_cls)
     for name, fi in model_cls.model_fields.items():
@@ -179,11 +187,21 @@ def _emit_subcommand(
                 kw[k] = v
     subs = parser.add_subparsers(dest=f"{dest}.{tag}", required=required, **kw)
     for tagval, vnode in node["choices"].items():
-        sp = subs.add_parser(tagval)
-        _add_fields(sp, vnode["cls"], prefix=f"{dest}.", skip=(tag,))
+        sub_cls = vnode["cls"]
+        cfg = getattr(sub_cls, "model_config", {}) or {}
+        doc = inspect.cleandoc(sub_cls.__doc__ or "") or None
+        configured_description = cfg.get("description")
+        description = (
+            configured_description if configured_description is not None else doc
+        )
+        help = cfg.get("subcommand_help")
+        if help is None and description:
+            help = description.splitlines()[0]
+        sp = subs.add_parser(tagval, help=help, description=description)
+        _add_fields(sp, sub_cls, prefix=f"{dest}.", skip=(tag,))
 
 
-def _resolve_optional_subcommands(tree: dict, model: type) -> dict:
+def _resolve_optional_subcommands(tree: dict, model: type[BaseModel]) -> dict:
     """For an optional subcommand (Optional[discriminated union] with a default),
     argparse writes the discriminator dest as None when no subcommand is chosen;
     collapse that subtree to None so the field takes its model default."""
@@ -200,7 +218,7 @@ def _resolve_optional_subcommands(tree: dict, model: type) -> dict:
 
 
 def build_parser(
-    model: type, parser: argparse.ArgumentParser | None = None
+    model: type[BaseModel], parser: argparse.ArgumentParser | None = None
 ) -> argparse.ArgumentParser:
     if parser is None:
         parser = argparse.ArgumentParser(**_parser_kwargs(model))

@@ -89,7 +89,7 @@ def test_subparsers_section_in_help(capsys):
 
     class Root(ta.TypedArgs):
         subcommand: Annotated[
-            Union[Add, Add],
+            Optional[Union[Add, Add]],
             Field(discriminator="cmd"),
             ta.Subparsers(title="Commands", description="pick one"),
         ] = None
