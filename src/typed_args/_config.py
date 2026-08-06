@@ -4,14 +4,15 @@ import argparse
 from typing import Optional
 
 from pydantic import ConfigDict
-from ._formatter import DefaultHelpFormatter
 
 
 class ParserConfig(ConfigDict, total=False):
     """Parser config that lives in ``model_config`` alongside pydantic config.
 
-    Fields mirror ``argparse.ArgumentParser.__init__``. Mix freely with
-    pydantic's own config keys, e.g.::
+    Fields mirror ``argparse.ArgumentParser.__init__``, plus
+    ``subcommand_help`` for the short summary shown in the parent parser's
+    command list. A subcommand's ``description`` is its detailed help text.
+    Mix freely with pydantic's own config keys, e.g.::
 
         model_config = ParserConfig(prog="cli", description="...", frozen=True)
 
@@ -22,6 +23,7 @@ class ParserConfig(ConfigDict, total=False):
     prog: Optional[str]
     usage: Optional[str]
     description: Optional[str]
+    subcommand_help: Optional[str]
     epilog: Optional[str]
     prefix_chars: str
     fromfile_prefix_chars: Optional[str]
