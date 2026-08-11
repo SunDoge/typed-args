@@ -77,6 +77,22 @@ def _opt_strings(name: str, arg: Arg | None) -> tuple[str, ...]:
     return (f"--{name.replace('_', '-')}",)
 
 
+def _is_positional(arg: Arg | None, default: Any) -> bool:
+    """Whether a field maps to a positional rather than an optional ``--flag``.
+
+    ``Arg(positional=True)`` forces positional regardless of default — the escape
+    hatch for an optional positional that carries its own fallback. ``Arg`` rejects
+    combining that marker with option strings. Otherwise the field is positional only
+    when it has no ``option_strings`` and no default: a bare default with no option
+    strings becomes a ``--flag`` (the ``foo: int = 5`` → ``--foo`` idiom).
+    """
+    if arg and arg.option_strings:
+        return False
+    if arg is not None and arg.positional:
+        return True
+    return default is _UNSET
+
+
 def _add(parser, name, dest, default, arg, *, extra=None, help=None):
     """Add one argument, merging Arg.kwargs over type-derived defaults.
 
@@ -93,10 +109,10 @@ def _add(parser, name, dest, default, arg, *, extra=None, help=None):
         )
     if "help" not in kw and help:
         kw["help"] = help
-    positional = (not arg or not arg.option_strings) and default is _UNSET
-    if positional:
+    if _is_positional(arg, default):
+        # Positionals reject ``required``; argparse infers optionality from nargs.
         kw.pop("required", None)
-        kw.setdefault("default", None)
+        kw.setdefault("default", None if default is _UNSET else default)
         parser.add_argument(dest=dest, **kw)
     else:
         if default is not _UNSET:

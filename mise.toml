@@ -1,2 +1,13 @@
 [tools]
 ruff = "latest"
+ty = "latest"
+uv = "0.11.26"
+
+[tasks.format]
+run = "ruff format"
+
+[tasks.test]
+run = "uv run pytest"
+
+[tasks.typecheck]
+run = "ty check"

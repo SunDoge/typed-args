@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0]
+
+- Add `Arg(positional=True)`, which forces a field to be a positional argument even when
+  it has a default. Previously a field with a default and no option strings was always
+  routed to a `--flag` (the `foo: int = 5` → `--foo` idiom), so an optional positional
+  with its own fallback could not be expressed — the default had to be handled out of
+  band. `path: Annotated[str, Arg(nargs="?", positional=True)] = "fallback"` now yields a
+  positional that argparse honours the default for when omitted. Existing behaviour is
+  unchanged: fields without `positional=True` keep the flag idiom.
+
 ## [0.6.4]
 
 - Parse doc for class as description.
@@ -82,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace attributes by name
 
 [unreleased]: https://github.com/SunDoge/typed-args
+[0.10.0]: https://github.com/SunDoge/typed-args/tree/v0.10.0
 [0.6.4]: https://github.com/SunDoge/typed-args/tree/v0.6.4
 [0.6.3]: https://github.com/SunDoge/typed-args/tree/v0.6.3
 [0.6.2]: https://github.com/SunDoge/typed-args/tree/v0.6.2
