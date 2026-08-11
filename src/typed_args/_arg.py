@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from typing import Any, Callable, Iterable
 
-__all__ = ["Arg", "Group", "Subparsers", "Mutex"]
+__all__ = ["Arg", "Group", "Mutex", "Subparsers"]
 
 
 class Arg:
