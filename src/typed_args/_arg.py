@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from typing import Any, Callable, Iterable
 
-__all__ = ["Arg", "Group", "Subparsers", "Mutex"]
+__all__ = ["Arg", "Group", "Mutex", "Subparsers"]
 
 
 class Arg:
@@ -23,9 +23,17 @@ class Arg:
     between the argparse namespace and the model field — overriding it would desync the
     two. To change the CLI attribute, rename the field; to change the flag name, use
     option strings.
+
+    ``positional`` forces a field without option strings to be a positional argument
+    regardless of whether it has a default. It is mutually exclusive with option
+    strings. By default a field with a default and no option strings becomes a ``--flag``
+    (the ``foo: int = 5`` → ``--foo`` idiom); ``positional=True`` overrides that so an
+    optional positional can carry its own fallback, e.g.
+    ``path: Annotated[str, Arg(nargs="?", positional=True)] = "fallback"``. Pair it with
+    ``nargs="?"`` (or ``"*"``) so argparse treats the positional as optional when omitted.
     """
 
-    __slots__ = ("option_strings", "kwargs")
+    __slots__ = ("option_strings", "positional", "kwargs")
 
     def __init__(
         self,
@@ -39,9 +47,15 @@ class Arg:
         required: bool | None = None,
         help: str | None = None,
         metavar: str | tuple[str, ...] | None = None,
+        positional: bool = False,
         **kwargs: Any,
     ) -> None:
+        if positional and option_strings:
+            raise ValueError(
+                "Arg(positional=True) cannot be combined with option strings"
+            )
         self.option_strings = option_strings
+        self.positional = positional
         for k, v in {
             "action": action,
             "nargs": nargs,
@@ -58,7 +72,7 @@ class Arg:
         self.kwargs = kwargs
 
     def __repr__(self) -> str:
-        return f"Arg({self.option_strings!r}, {self.kwargs!r})"
+        return f"Arg({self.option_strings!r}, positional={self.positional}, {self.kwargs!r})"
 
 
 class Group:

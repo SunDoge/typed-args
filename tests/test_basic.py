@@ -74,3 +74,46 @@ def test_dest_override_rejected():
     # rejected with a clear error rather than silently desyncing the namespace.
     with pytest.raises(ValueError, match="dest"):
         Args.parse_args(["-f", "v"])
+
+
+def test_positional_with_nargs_and_default():
+    # positional=True + nargs="?" + default → optional positional, NOT a --flag.
+    class Args(ta.TypedArgs):
+        path: Annotated[str, ta.Arg(nargs="?", positional=True)] = "fallback"
+
+    a = Args.parse_args([])
+    assert a.path == "fallback"
+    b = Args.parse_args(["given"])
+    assert b.path == "given"
+
+
+def test_positional_default_is_not_a_flag():
+    # The positional-with-default must not register a --path option.
+    class Args(ta.TypedArgs):
+        path: Annotated[str, ta.Arg(nargs="?", positional=True)] = "fallback"
+
+    with pytest.raises(SystemExit):
+        Args.parse_args(["--path", "x"])
+
+
+def test_positional_rejects_option_strings():
+    with pytest.raises(ValueError, match="positional=True.*option strings"):
+        ta.Arg("--path", positional=True)
+
+
+def test_default_without_positional_is_still_a_flag():
+    # Backward compat: a field with nargs and a default but NO positional=True
+    # stays a --flag (the markers ID... pattern), not a positional.
+    class Args(ta.TypedArgs):
+        markers: Annotated[Optional[list[int]], ta.Arg(metavar="ID", nargs="+")] = None
+
+    assert Args.parse_args([]).markers is None
+    assert Args.parse_args(["--markers", "0", "5"]).markers == [0, 5]
+
+
+def test_list_positional_with_default():
+    class Args(ta.TypedArgs):
+        files: Annotated[list[str], ta.Arg(nargs="*", positional=True)] = ["d"]
+
+    assert Args.parse_args([]).files == ["d"]
+    assert Args.parse_args(["a", "b"]).files == ["a", "b"]

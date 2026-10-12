@@ -9,11 +9,8 @@ from pydantic import BaseModel
 from ._arg import Arg, Group, Mutex, Subparsers
 from ._formatter import DefaultHelpFormatter
 from ._schema import (
-    DefaultNode,
     FieldEntry,
-    LiteralNode,
     ModelFieldsNode,
-    ModelNode,
     Node,
     NullableNode,
     TaggedUnionNode,
@@ -57,15 +54,13 @@ def _get_marker(fi, cls: type[M]) -> M | None:
 def _unwrap(node: Node) -> tuple[Node, Any]:
     """Strip default/nullable wrappers, carrying the default value out (if any)."""
     default = _UNSET
-    # pyright does not narrow TypedDict discriminators inside loops, so cast at
-    # each access after the type check.
     while node["type"] in ("default", "nullable"):
         if node["type"] == "default":
-            d = cast(DefaultNode, node)
             if default is _UNSET:
-                default = d["default"]
-            node = d["schema"]
+                default = node["default"]
+            node = node["schema"]
         else:
+            # The loop condition prevents pyright from narrowing this branch.
             n = cast(NullableNode, node)
             node = n["schema"]
     return node, default
@@ -75,6 +70,22 @@ def _opt_strings(name: str, arg: Arg | None) -> tuple[str, ...]:
     if arg and arg.option_strings:
         return arg.option_strings
     return (f"--{name.replace('_', '-')}",)
+
+
+def _is_positional(arg: Arg | None, default: Any) -> bool:
+    """Whether a field maps to a positional rather than an optional ``--flag``.
+
+    ``Arg(positional=True)`` forces positional regardless of default — the escape
+    hatch for an optional positional that carries its own fallback. ``Arg`` rejects
+    combining that marker with option strings. Otherwise the field is positional only
+    when it has no ``option_strings`` and no default: a bare default with no option
+    strings becomes a ``--flag`` (the ``foo: int = 5`` → ``--foo`` idiom).
+    """
+    if arg and arg.option_strings:
+        return False
+    if arg is not None and arg.positional:
+        return True
+    return default is _UNSET
 
 
 def _add(parser, name, dest, default, arg, *, extra=None, help=None):
@@ -93,10 +104,10 @@ def _add(parser, name, dest, default, arg, *, extra=None, help=None):
         )
     if "help" not in kw and help:
         kw["help"] = help
-    positional = (not arg or not arg.option_strings) and default is _UNSET
-    if positional:
+    if _is_positional(arg, default):
+        # Positionals reject ``required``; argparse infers optionality from nargs.
         kw.pop("required", None)
-        kw.setdefault("default", None)
+        kw.setdefault("default", None if default is _UNSET else default)
         parser.add_argument(dest=dest, **kw)
     else:
         if default is not _UNSET:
@@ -106,17 +117,15 @@ def _add(parser, name, dest, default, arg, *, extra=None, help=None):
 
 def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
     if node["type"] == "tagged-union":
-        tagged = cast(TaggedUnionNode, node)
         _emit_subcommand(
             parser,
-            tagged,
+            node,
             dest,
             required=(default is _UNSET),
             subparsers=_get_marker(fi, Subparsers),
         )
         return
     if node["type"] == "model":
-        model = cast(ModelNode, node)
         group = _get_marker(fi, Group)
         mutex = _get_marker(fi, Mutex)
         if group:
@@ -125,7 +134,7 @@ def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
             target = parser.add_mutually_exclusive_group(required=mutex.required)
         else:
             target = parser
-        _add_fields(target, model["cls"], prefix=f"{dest}.")
+        _add_fields(target, node["cls"], prefix=f"{dest}.")
         return
     arg = _get_marker(fi, Arg)
     help = fi.description
@@ -137,14 +146,13 @@ def _emit(parser, model_cls, name, node: Node, default, fi, dest) -> None:
             _add(parser, name, dest, d, arg, extra={"action": "store_true"}, help=help)
         return
     if node["type"] == "literal":
-        literal = cast(LiteralNode, node)
         _add(
             parser,
             name,
             dest,
             default,
             arg,
-            extra={"choices": literal["expected"]},
+            extra={"choices": node["expected"]},
             help=help,
         )
         return
@@ -210,9 +218,8 @@ def _resolve_optional_subcommands(tree: dict, model: type[BaseModel]) -> dict:
         entry: FieldEntry = fields_node["fields"][name]
         node, default = _unwrap(entry["schema"])
         if node["type"] == "tagged-union" and default is not _UNSET:
-            tu = cast(TaggedUnionNode, node)
             sub = tree.get(name)
-            if isinstance(sub, dict) and sub.get(tu["discriminator"]) is None:
+            if isinstance(sub, dict) and sub.get(node["discriminator"]) is None:
                 tree[name] = None
     return tree
 

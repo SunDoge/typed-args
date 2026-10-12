@@ -7,14 +7,14 @@ from ._parser import TypedArgs, add_arguments, from_namespace, parse, parse_know
 
 __all__ = [
     "Arg",
+    "DefaultHelpFormatter",
     "Group",
     "Mutex",
+    "ParserConfig",
     "Subparsers",
     "TypedArgs",
-    "ParserConfig",
-    "parse",
-    "parse_known_args",
     "add_arguments",
     "from_namespace",
-    "DefaultHelpFormatter",
+    "parse",
+    "parse_known_args",
 ]

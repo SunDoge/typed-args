@@ -28,8 +28,12 @@ from pydantic import Field
 
 class Args(ta.TypedArgs):
     model_config = ta.ParserConfig(description="Process some integers.")
-    integers: Annotated[List[int], ta.Arg(metavar="N", nargs="+", help="an integer for the accumulator")]
-    workers: Annotated[int, Field(gt=0, le=32), ta.Arg("-w", "--workers", help="worker count")] = 4
+    integers: Annotated[
+        List[int], ta.Arg(metavar="N", nargs="+", help="an integer for the accumulator")
+    ]
+    workers: Annotated[
+        int, Field(gt=0, le=32), ta.Arg("-w", "--workers", help="worker count")
+    ] = 4
 
 
 args = Args.parse_args()
@@ -51,7 +55,10 @@ raises a `pydantic.ValidationError` instead of silently producing a bad value.
 ## How it works
 
 - **Types drive structure.** `bool` → `--flag` (store_true), `Literal[...]` → `choices`,
-  `list` → `nargs`, `Optional`/defaults → optional args, required scalars → positionals.
+  `list` → `nargs`, required scalars → positionals, defaults → optional `--flags`. An
+  optional positional that carries its own fallback opts in with
+  `Arg(nargs="?", positional=True)`: `path: Annotated[str, Arg(nargs="?", positional=True)] = "fallback"`
+  is a positional that falls back to `"fallback"` when omitted — not a `--path` flag.
 - **`Arg(...)` is the argparse passthrough.** Attach it via `Annotated[T, Arg(...)]` for
   option strings, `help`, `metavar`, `action`, `nargs`, `const`, ... It overlays
   argparse params on top of the type-derived defaults.
